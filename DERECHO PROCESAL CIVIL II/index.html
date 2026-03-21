@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLex - Recursos en Derecho Civil</title>
+    <!-- Librerías Externas -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #020617;
+            --primary: #fbbf24;
+            /* Dorado Justicia */
+            --secondary: #d97706;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --glass: rgba(15, 23, 42, 0.9);
+            --border: rgba(255, 255, 255, 0.1);
+            --card-height: 320px;
+            --accent-red: #f43f5e;
+            --accent-green: #22c55e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%) fixed;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 120px;
+        }
+
+        #confetti-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 20000;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 6rem 1.5rem 2rem;
+        }
+
+        nav.top-bar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        .hero-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .hero-header h2 {
+            font-size: 2.5rem;
+        }
+
+        .hero-header p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .master-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+            margin-top: 2rem;
+            width: 100%;
+            align-items: center;
+        }
+
+        .category-label {
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            scroll-margin-top: 100px;
+        }
+
+        .category-label::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Tarjeta de Lección */
+        .flashcard {
+            width: 100%;
+            max-width: 500px;
+            height: var(--card-height);
+            perspective: 1000px;
+            margin: 0 auto 1rem;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.is-flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front,
+        .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .flashcard h3 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: white;
+            width: 100%;
+        }
+
+        .flashcard p {
+            text-align: left;
+            width: 100%;
+            color: var(--text-dim);
+        }
+
+        .flashcard-front {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+            border-left: 5px solid var(--primary);
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            transform: rotateY(180deg);
+            border-color: var(--primary);
+        }
+
+        .flashcard-back p {
+            color: white;
+        }
+
+        .tag-teoria {
+            font-size: 0.7rem;
+            color: var(--primary);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .btn-card-action {
+            margin-top: 1.5rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 100px;
+            border: 1px solid var(--primary);
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-card-action:hover {
+            background: var(--primary);
+            color: #000;
+        }
+
+        /* Tarjeta de Reto */
+        .challenge-card {
+            width: 100%;
+            max-width: 500px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 2.2rem;
+            transition: 0.3s;
+            border-left: 5px solid var(--accent-red);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .challenge-card:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-red);
+        }
+
+        .challenge-card h3 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: white;
+            width: 100%;
+        }
+
+        .challenge-card p {
+            text-align: left;
+            width: 100%;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-play {
+            width: 100%;
+            max-width: 280px;
+            padding: 1.1rem;
+            border-radius: 20px;
+            border: none;
+            background: var(--accent-red);
+            color: white;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 8px 15px rgba(244, 63, 94, 0.2);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .btn-play:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        /* Menú Inferior */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 85px;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10000;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.65rem;
+            font-weight: 700;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-item svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        /* Modal */
+        #modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.98);
+            z-index: 15000;
+            display: none;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            padding-top: 5vh;
+        }
+
+        #modal-box {
+            width: 100%;
+            max-width: 500px;
+            background: #1e293b;
+            padding: 2rem;
+            border-radius: 35px;
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 0 auto;
+        }
+
+        .challenge-header {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .challenge-header .student-info {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--primary);
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .challenge-header .challenge-name {
+            font-size: 1rem;
+            color: white;
+            font-weight: 800;
+        }
+
+        .q-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            color: white;
+            line-height: 1.3;
+            text-align: center;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 1.1rem;
+            border-radius: 18px;
+            margin-bottom: 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: white;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: rgba(51, 191, 36, 0.1);
+        }
+
+        /* Clases auxiliares para JS */
+        .modal-body-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-jurista-primary {
+            background: var(--primary);
+            color: #000;
+            margin-bottom: 2rem;
+        }
+
+        .btn-jurista-cancel {
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-boolean-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn-boolean-true {
+            background: var(--accent-green);
+            margin: 0;
+        }
+
+        .btn-boolean-false {
+            background: #475569;
+            margin: 0;
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 1rem;
+            background: #0f172a;
+            border: 1px solid var(--primary);
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            outline: none;
+        }
+
+        .challenge-info-sub {
+            opacity: 0.8;
+        }
+
+        .menu-list {
+            width: 100%;
+        }
+
+        .menu-item-link {
+            text-decoration: none;
+            display: block;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .menu-item-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .menu-item-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .menu-item-title {
+            font-weight: 800;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .result-percentage {
+            font-size: 4.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .result-pass {
+            color: var(--accent-green);
+        }
+
+        .result-fail {
+            color: var(--accent-red);
+        }
+
+        .result-text {
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-align: left;
+        }
+
+        #laser {
+            position: fixed;
+            width: 14px;
+            height: 14px;
+            background: var(--accent-red);
+            box-shadow: 0 0 15px var(--accent-red), 0 0 30px var(--accent-red);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 18000;
+            display: none;
+            transform: translate(-50%, -50%);
+        }
+
+        .word-display {
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: var(--primary);
+            margin: 1.5rem 0;
+            font-family: monospace;
+            text-align: center;
+        }
+
+        #hidden-kbd-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .kb-prompt {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .lives-count {
+            margin-top: 1rem;
+            color: var(--accent-red);
+            font-weight: 900;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body onclick="focusKbd()">
+
+    <canvas id="confetti-layer"></canvas>
+    <div id="laser"></div>
+
+    <nav class="top-bar">
+        <div class="logo">EDU<span>LEX</span></div>
+        <div id="clock-display">00:00:00</div>
+    </nav>
+
+    <main id="main-content">
+        <header class="hero-header">
+            <h2 class="animate__animated animate__fadeIn">Recursos <span>Civiles</span></h2>
+            <p class="animate__animated animate__fadeIn">Domina la impugnación y la alzada jurídica.</p>
+        </header>
+
+        <div class="master-flow">
+
+            <div class="category-label" id="modulo-0">Módulo 01: Las Bases</div>
+
+            <div class="flashcard" id="card-1">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        <span class="tag-teoria">Teoría</span>
+                        <h3>Recurso de Reposición</h3>
+                        <p>Es el mecanismo ordinario para corregir errores en providencias dictadas por el mismo juez de
+                            la causa antes de que queden firmes.</p>
+                        <button class="btn-card-action" onclick="flipCard('card-1')">Ver Respuesta</button>
+                    </div>
+                    <div class="flashcard-back">
+                        <h3>Fundamento Jurídico</h3>
+                        <p>Se interpone ante el <b>mismo juez</b> que dictó la providencia para que la revoque por
+                            contrario imperio. <b>Plazo:</b> Generalmente 3 días.</p>
+                        <button class="btn-card-action" onclick="flipCard('card-1')">Ocultar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="challenge-card">
+                <h3>Juicio de Reposición</h3>
+                <p>Evalúa si este recurso procede contra autos interlocutorios o sentencias definitivas según la
+                    normativa vigente en materia procesal civil.</p>
+                <button class="btn-play" onclick="openIntro(0)">Comenzar Reto</button>
+            </div>
+
+            <div class="category-label" id="modulo-1">Módulo 02: Apelación</div>
+
+            <div class="flashcard" id="card-2">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        <span class="tag-teoria">Teoría</span>
+                        <h3>Efectos de la Apelación</h3>
+                        <p>El traslado de la controversia a un superior jerárquico conlleva efectos específicos sobre la
+                            ejecución de lo resuelto originalmente.</p>
+                        <button class="btn-card-action" onclick="flipCard('card-2')">Ver Respuesta</button>
+                    </div>
+                    <div class="flashcard-back">
+                        <h3>Efectos Procesales</h3>
+                        <p><b>Efecto Suspensivo:</b> Detiene la ejecución.<br><b>Efecto Devolutivo:</b> Permite
+                            continuar el proceso mientras el superior resuelve.</p>
+                        <button class="btn-card-action" onclick="flipCard('card-2')">Ocultar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="challenge-card">
+                <h3>El Tribunal de Alzada</h3>
+                <p>Identifica los plazos y la autoridad competente para resolver la apelación en sede de segunda
+                    instancia judicial y sus requerimientos.</p>
+                <button class="btn-play" onclick="openIntro(1)">Comenzar Reto</button>
+            </div>
+
+            <div class="category-label" id="modulo-2">Módulo 03: Casación</div>
+
+            <div class="flashcard" id="card-3">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        <span class="tag-teoria">Teoría</span>
+                        <h3>Casación Jurídica</h3>
+                        <p>Recurso extraordinario que protege el principio de legalidad y asegura la unificación de la
+                            interpretación de la ley en todo el territorio.</p>
+                        <button class="btn-card-action" onclick="flipCard('card-3')">Ver Respuesta</button>
+                    </div>
+                    <div class="flashcard-back">
+                        <h3>Naturaleza del Recurso</h3>
+                        <p>No es una tercera instancia. Busca la <b>uniformidad de la jurisprudencia</b> y el control de
+                            legalidad estricto de las sentencias.</p>
+                        <button class="btn-card-action" onclick="flipCard('card-3')">Ocultar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="challenge-card">
+                <h3>Misión Nomofiláctica</h3>
+                <p>Adivina el término extraordinario correspondiente a la máxima instancia de control jurídico mediante
+                    el teclado de tu dispositivo.</p>
+                <button class="btn-play" onclick="openIntro(2)">Jugar Ahorcado</button>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bottom-nav">
+        <button class="nav-item active" onclick="window.location.href='../index.html'">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+            <span>Inicio</span>
+        </button>
+        <button class="nav-item" onclick="toggleLaser()">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42A6.92 6.92 0 0119 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-1.91.77-3.63 2-4.88L5.58 5.7A8.937 8.937 0 003 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.49-1.01-4.74-2.65-6.35l.48-.48z" />
+            </svg>
+            <span>Láser</span>
+        </button>
+        <button class="nav-item" onclick="showLessonsMenu()">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z" />
+            </svg>
+            <span>Recursos</span>
+        </button>
+    </footer>
+
+    <input type="text" id="hidden-kbd-input" autocomplete="off" oninput="handleKbdInput(this)">
+
+    <div id="modal-overlay">
+        <div id="modal-box" class="animate__animated animate__zoomIn">
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const retos = [
+            {
+                id: 0, title: 'Juicio de Reposición', type: 'boolean',
+                questions: [{ q: "¿La reposición procede contra la sentencia definitiva?", a: false }, { q: "¿El mismo juez que dictó la medida es quien la resuelve?", a: true }]
+            },
+            {
+                id: 1, title: 'El Tribunal de Alzada', type: 'multiple',
+                questions: [{ q: "¿Qué efecto suspende la ejecución de la sentencia?", opts: ["Efecto Devolutivo", "Efecto Suspensivo", "Efecto Diferido"], a: "Efecto Suspensivo" }]
+            },
+            { id: 2, title: 'Misión Nomofiláctica', type: 'hangman', word: "CASACION", hint: "Recurso extraordinario que busca unificar doctrina." }
+        ];
+
+        let state = { user: "", score: 0, currentIdx: 0, currentReto: null, laserActive: false, hangmanErrors: 0, guessedLetters: [], history: [] };
+        const fireConfetti = confetti.create(document.getElementById('confetti-layer'), { resize: true });
+
+        function launchConfetti(isSuccess) {
+            const color = isSuccess ? ['#22c55e', '#ffffff'] : ['#ef4444', '#000000'];
+            fireConfetti({
+                particleCount: isSuccess ? 150 : 60, spread: isSuccess ? 70 : 40,
+                origin: { y: 0.6 }, colors: color, gravity: isSuccess ? 1 : 2
+            });
+        }
+
+        function updateTime() {
+            const clock = document.getElementById('clock-display');
+            if (clock) clock.textContent = new Date().toTimeString().split(' ')[0];
+        }
+        setInterval(updateTime, 1000); updateTime();
+
+        function flipCard(id) { document.getElementById(id).classList.toggle('is-flipped'); }
+
+        function toggleLaser() {
+            state.laserActive = !state.laserActive;
+            const laser = document.getElementById('laser');
+            laser.style.display = state.laserActive ? 'block' : 'none';
+            document.body.style.cursor = state.laserActive ? 'none' : 'default';
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (state.laserActive) {
+                const laser = document.getElementById('laser');
+                laser.style.left = e.clientX + 'px';
+                laser.style.top = e.clientY + 'px';
+            }
+        });
+
+        function showLessonsMenu() {
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            overlay.style.display = 'flex';
+            const menuHTML = retos.map((reto, index) => {
+                const completed = state.history.find(h => h.title === reto.title);
+                return `
+                    <a href="#modulo-${index}" onclick="closeModal()" class="menu-item-link">
+                        <div class="menu-item-box">
+                            <div class="menu-item-info">
+                                <span class="menu-item-title">${reto.title}</span>
+                            </div>
+                            <div style="font-size:1.2rem;">${completed ? '🏛️' : '📜'}</div>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+            content.innerHTML = `
+                <div class="animate__animated animate__fadeIn modal-body-wrapper">
+                    <h2 class="q-text" style="color:var(--primary)">Guía de Recursos</h2>
+                    <div class="menu-list">${menuHTML}</div>
+                    <button class="btn-play btn-jurista-primary" style="margin-top:1rem;" onclick="closeModal()">Seguir estudiando</button>
+                </div>`;
+        }
+
+        function openIntro(idx) {
+            state.currentReto = retos[idx];
+            state.user = "";
+            document.getElementById('modal-overlay').style.display = 'flex';
+            document.getElementById('modal-content').innerHTML = `
+                <div class="animate__animated animate__fadeIn modal-body-wrapper">
+                    <h2 class="q-text" style="font-size: 1.2rem; margin-bottom: 1rem;">Identificación del Jurista</h2>
+                    <input type="text" id="user-name" placeholder="Escribe tu nombre..." class="name-input" autofocus>
+                    <button class="btn-play btn-jurista-primary" onclick="startReto()">ENTRAR AL RETO</button>
+                    <div class="challenge-header challenge-info-sub">
+                        <div class="challenge-name">Desafío: ${state.currentReto.title}</div>
+                    </div>
+                    <button class="btn-jurista-cancel" onclick="closeModal()">Cerrar</button>
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+            document.getElementById('hidden-kbd-input').blur();
+        }
+
+        function startReto() {
+            const input = document.getElementById('user-name');
+            const name = input.value.trim();
+            if (!name) {
+                input.classList.add('animate__animated', 'animate__shakeX');
+                setTimeout(() => input.classList.remove('animate__shakeX'), 500);
+                return;
+            }
+            state.user = name;
+            state.score = 0; state.currentIdx = 0; state.hangmanErrors = 0; state.guessedLetters = [];
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const content = document.getElementById('modal-content');
+            const data = state.currentReto;
+            if (!state.user) return;
+
+            if (data.type !== 'hangman' && state.currentIdx >= data.questions.length) { renderResults(); return; }
+
+            let headerUI = `<div class="challenge-header">
+                <div class="student-info">ESTUDIANTE: ${state.user}</div>
+                <div class="challenge-name">${data.title}</div>
+            </div>`;
+
+            let ui = "";
+            if (data.type === 'boolean') {
+                const q = data.questions[state.currentIdx];
+                ui = `<p class="q-text">${q.q}</p>
+                    <div class="btn-boolean-container">
+                        <button class="btn-play btn-boolean-true" onclick="checkAnswer(true)">Verdadero</button>
+                        <button class="btn-play btn-boolean-false" onclick="checkAnswer(false)">Falso</button>
+                    </div>`;
+            } else if (data.type === 'multiple') {
+                const q = data.questions[state.currentIdx];
+                ui = `<p class="q-text">${q.q}</p>
+                      <div class="modal-body-wrapper">` + q.opts.map(o => `<button class="option-btn" onclick="checkAnswer('${o}')">${o}</button>`).join('') + `</div>`;
+            } else if (data.type === 'hangman') {
+                const display = data.word.split('').map(l => state.guessedLetters.includes(l) ? l : '_').join(' ');
+                ui = `<div class="word-display animate__animated animate__bounceIn">${display}</div>
+                    <p class="kb-prompt" style="text-align:left;">Pista: ${data.hint}</p>
+                    <div class="kb-prompt">Escribe con el teclado del celular</div>
+                    <p class="lives-count">Vidas: ${6 - state.hangmanErrors}/6</p>`;
+                setTimeout(focusKbd, 100);
+            }
+
+            content.innerHTML = `<div class="animate__animated animate__fadeIn modal-body-wrapper">${headerUI}${ui}</div>`;
+
+            if (data.type === 'hangman') {
+                const won = data.word.split('').every(l => state.guessedLetters.includes(l));
+                if (won) {
+                    state.score = (6 - state.hangmanErrors) / 6;
+                    setTimeout(renderResults, 600);
+                }
+                else if (state.hangmanErrors >= 6) {
+                    state.score = 0;
+                    setTimeout(renderResults, 600);
+                }
+            }
+        }
+
+        function focusKbd() {
+            const inp = document.getElementById('hidden-kbd-input');
+            const overlay = document.getElementById('modal-overlay');
+            if (overlay.style.display === 'flex' && state.user && state.currentReto && state.currentReto.type === 'hangman') {
+                inp.focus();
+            }
+        }
+
+        function handleKbdInput(el) {
+            if (!state.user) return;
+            const letter = el.value.slice(-1).toUpperCase();
+            el.value = "";
+            if (letter.match(/[A-ZÑ]/) && state.currentReto && state.currentReto.type === 'hangman') {
+                if (!state.guessedLetters.includes(letter)) {
+                    guessLetter(letter);
+                }
+            }
+        }
+
+        function guessLetter(l) {
+            state.guessedLetters.push(l);
+            const correct = state.currentReto.word.includes(l);
+            if (!correct) {
+                state.hangmanErrors++;
+                launchConfetti(false);
+            } else {
+                launchConfetti(true);
+            }
+            renderQuestion();
+        }
+
+        function checkAnswer(val) {
+            const q = state.currentReto.questions[state.currentIdx];
+            const isCorrect = (val === q.a);
+            if (isCorrect) state.score++;
+            launchConfetti(isCorrect);
+            state.currentIdx++;
+            setTimeout(renderQuestion, 800);
+        }
+
+        function renderResults() {
+            let percentage;
+            if (state.currentReto.type === 'hangman') {
+                percentage = Math.max(0, Math.round(state.score * 100));
+            } else {
+                percentage = Math.round((state.score / state.currentReto.questions.length) * 100);
+            }
+
+            const isPass = percentage >= 50;
+            state.history.push({ title: state.currentReto.title, user: state.user, percentage: percentage });
+            document.getElementById('hidden-kbd-input').blur();
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="animate__animated animate__zoomIn modal-body-wrapper">
+                    <div class="challenge-header"><div class="student-info">DICTAMEN PARA: ${state.user}</div><div class="challenge-name">${state.currentReto.title}</div></div>
+                    <div class="result-percentage ${isPass ? 'result-pass' : 'result-fail'}">${percentage}%</div>
+                    <p class="result-text">
+                        ${isPass ? '¡Ha demostrado aptitud jurídica profesional! Los errores cometidos han sido registrados en la calificación.' : 'Fallo en contra. El exceso de errores procesales ha anulado su nota.'}
+                    </p>
+                    <button class="btn-play btn-jurista-primary" onclick="closeModal()">Regresar a la Corte</button>
+                </div>
+            `;
+            if (isPass) { setTimeout(() => launchConfetti(true), 300); setTimeout(() => launchConfetti(true), 700); }
+        }
+    </script>
+</body>
+
+</html>
