@@ -1,1 +1,293 @@
-Hola Mundo
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLex - Portal Jurídico</title>
+    <!-- Librerías Externas -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #020617;
+            --primary: #fbbf24; /* Dorado Justicia */
+            --secondary: #d97706;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --glass: rgba(15, 23, 42, 0.9);
+            --border: rgba(255, 255, 255, 0.1);
+            --card-height: 240px; 
+        }
+
+        /* Reset y Estilos Generales */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%) fixed;
+            color: var(--text);
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        main { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 4rem 1.5rem 6rem; 
+        }
+
+        /* Barra de Navegación */
+        nav.top-bar {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 900; color: var(--primary); letter-spacing: -1px; text-decoration: none; }
+        .logo span { color: white; }
+
+        /* Cabecera y Buscador en una sola línea para PC */
+        .landing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap; 
+        }
+
+        .title-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .title-box h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .title-box p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-top: 0.3rem;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 450px;
+            min-width: 280px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.8rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+        }
+
+        /* Cuadrícula Responsiva: 4 PC, 2 Tablet, 1 Móvil */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .subject-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 1024px) {
+            .subject-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        /* Tarjeta Estilo Overlay */
+        .subject-card {
+            position: relative;
+            height: var(--card-height);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #000;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .subject-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .subject-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            transition: 0.5s;
+        }
+
+        .subject-card:hover img {
+            opacity: 0.3;
+            transform: scale(1.1);
+        }
+
+        /* Capa de contenido sobre la imagen */
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: linear-gradient(to top, rgba(2, 6, 23, 0.95) 10%, transparent 90%);
+        }
+
+        .card-overlay h3 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 0.4rem;
+            text-align: center;
+        }
+
+        .card-overlay p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+            text-align: left;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+        }
+
+        /* Botón Link */
+        .btn-action {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--primary);
+            color: #000;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            text-align: center;
+            transition: 0.3s;
+            display: block;
+        }
+
+        .btn-action:hover {
+            background: white;
+            transform: scale(1.02);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="top-bar">
+        <a href="#" class="logo">EDU<span>LEX</span></a>
+    </nav>
+
+    <main>
+        <!-- CABECERA EN UNA LÍNEA -->
+        <header class="landing-header animate__animated animate__fadeIn">
+            <div class="title-box">
+                <h2>Malla <span>Curricular</span></h2>
+                <p>Tu portal de acceso a la formación jurídica.</p>
+            </div>
+            <div class="search-container">
+                <input type="text" id="subject-search" class="search-input" placeholder="Buscar materia..." oninput="filterSubjects()">
+            </div>
+        </header>
+
+        <!-- GRID DE MATERIAS -->
+        <div id="subject-list" class="subject-grid">
+            
+            <!-- Derecho Procesal Civil II -->
+            <div class="subject-card animate__animated animate__fadeInUp" data-title="Derecho Civil">
+                <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=800" alt="Civil">
+                <div class="card-overlay">
+                    <h3>Derecho Procesal Civil II</h3>
+                    <p>Estudia los procedimientos judiciales para resolver conflictos civiles ante los tribunales.</p>
+                    <div style="cursor: pointer;" class="btn-action" onclick="window.location.href='DERECHO PROCESAL CIVIL II/index.html'">Entrar a la Materia</div>
+                </div>
+            </div>
+
+            <!-- Derecho de la Niña, Niño y Adolescente y sus Procedimientos -->
+            <div class="subject-card animate__animated animate__fadeInUp" data-title="Derecho Civil">
+                <img src="https://img.freepik.com/foto-gratis/grupo-amigos-adolescentes-posando-juntos-casa-fiesta_23-2149332901.jpg?semt=ais_hybrid&w=740&q=80" alt="Civil">
+                <div class="card-overlay">
+                    <h3>Derecho de la Niña, Niño y Adolescente y sus Procedimientos</h3>
+                    <p>Regula la protección de los derechos de niñas, niños y adolescentes y los procedimientos legales para garantizar su bienestar.</p>
+                    <div style="cursor: pointer;" class="btn-action" onclick="window.location.href='DERECHO DE LA NIÑA, NIÑO Y ADOLESCENTE Y SUS PROCEDIMIENTOS/index.html'">Entrar a la Materia</div>
+                </div>
+            </div>
+
+            <!-- Derecho Internacional Privado -->
+            <div class="subject-card animate__animated animate__fadeInUp" data-title="Derecho Civil">
+                <img src="https://img.freepik.com/foto-gratis/concepto-viaje-plano-mano-que-sostiene-lupa-sobre-globo_176474-9520.jpg?semt=ais_hybrid&w=740&q=80" alt="Civil">
+                <div class="card-overlay">
+                    <h3>Derecho Internacional Privado</h3>
+                    <p>Regula los conflictos legales entre personas de distintos países y determina qué ley se aplica en cada caso.</p>
+                    <div style="cursor: pointer;" class="btn-action" onclick="window.location.href='DERECHO INTERNACIONAL PRIVADO/index.html'">Entrar a la Materia</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        &copy; EduLex - Plataforma de Formación Jurídica Profesional
+    </footer>
+
+    <script>
+        // Función del buscador en tiempo real
+        function filterSubjects() {
+            const query = document.getElementById('subject-search').value.toLowerCase();
+            const cards = document.querySelectorAll('.subject-card');
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                if (title.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
