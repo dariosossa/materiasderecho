@@ -4,46 +4,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DERECHO PROCESAL CIVIL II</title>
+    <title>DERECHO PROCESAL CIVIL II - ACADEMIA PREMIUM</title>
 
-    <!-- Animate.css -->
+    <!-- Bibliotecas Externas -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <!-- Google Fonts -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Lora:italic,wght@1,700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;900&family=Lora:italic,wght@0,400;1,700&display=swap"
         rel="stylesheet">
-    <!-- Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* --- CSS TRADICIONAL --- */
         :root {
-            --primary: #0f172a;
-            --secondary: #2563eb;
-            --accent: #10b981;
-            --error: #ef4444;
-            --light: #f8fafc;
-            --text: #334155;
-            --white: #ffffff;
-            --hl-yellow: #fef08a;
-            --hl-green: #bbf7d0;
-            --hl-blue: #bfdbfe;
-            --hl-pink: #fbcfe8;
+            --primary-blue: #1e40af;
+            --secondary-blue: #2563eb;
+            --soft-paper: #f7f3f0;
+            --text-dark: #1f2937;
+            --pure-white: #ffffff;
+            --nav-dark: #0f172a;
+            --accent-gold: #d4af37;
+
+            /* Kahoot Colors */
+            --kh-red: #e21b3c;
+            --kh-blue: #1368ce;
+            --kh-yellow: #d89e00;
+            --kh-black: #000;
+
+            /* Colores Resaltado */
+            --hl-yellow: #facc15;
+            --hl-green: #22c55e;
+            --hl-blue: #60a5fa;
+            --hl-pink: #db2777;
+
+            --transition-smooth: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--light);
-            color: var(--text);
-            line-height: 1.8;
+            background-color: var(--soft-paper);
+            color: var(--text-dark);
+            line-height: 1.6;
             overflow-x: hidden;
-            padding-bottom: 100px;
+            padding-bottom: 160px;
+        }
+
+        /* Bloqueo de scroll para el examen */
+        body.quiz-open {
+            overflow: hidden !important;
+            height: 100vh !important;
+            position: fixed;
+            width: 100%;
         }
 
         h1,
@@ -52,11 +68,10 @@
             font-weight: 900;
         }
 
-        /* Hero Section */
         header {
-            height: 45vh;
-            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)),
-                url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80');
+            height: 40vh;
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)),
+                url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -68,123 +83,139 @@
             padding: 20px;
         }
 
-        header h1 {
-            font-size: clamp(1.8rem, 6vw, 3.5rem);
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        /* Títulos de Ancho Completo */
-        .full-width-title {
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            background: var(--primary);
-            color: var(--white);
-            padding: 45px 20px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 40px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            font-size: clamp(1.4rem, 5vw, 2.2rem);
-        }
-
-        .full-width-title.alt {
-            background: var(--secondary);
-        }
-
         .container {
-            max-width: 1100px;
+            max-width: 1050px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px 15px;
         }
 
+        /* --- DISEÑO DE BLOQUES (TU IDEA) --- */
         section {
             margin-bottom: 80px;
-            position: relative;
+            scroll-margin-top: 30px;
         }
 
-        /* Lección Card */
-        .lesson-card {
-            background: white;
-            padding: 40px;
-            border-radius: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-            font-size: 1.15rem;
-            position: relative;
-        }
-
-        .lesson-card::after {
-            content: "";
-            display: table;
+        .lesson-block {
+            display: flow-root;
+            /* Contiene los floats de forma estricta */
+            width: 100%;
             clear: both;
         }
 
-        .lesson-image-wrapper {
-            width: 40%;
-            margin-bottom: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
+        /* Banner de Título Superior (image_a7f9e2.png) */
+        .title-banner {
+            background: var(--pure-white);
+            color: var(--secondary-blue);
+            padding: 22px 35px;
+            margin-bottom: 40px;
+            border-left: 14px solid var(--secondary-blue);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: clamp(1.1rem, 4vw, 1.8rem);
+            width: 100%;
+        }
+
+        /* Subtítulos que fluyen al lado de imágenes (image_a95668.jpg) */
+        .subtitle-banner {
+            background: var(--pure-white);
+            color: var(--secondary-blue);
+            padding: 12px 20px;
+            margin: 0 0 15px 0;
+            border-left: 8px solid var(--secondary-blue);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            display: inline-block;
+            width: fit-content;
+            clear: none;
+        }
+
+        /* Imágenes Flotantes */
+        .img-float {
+            width: 42%;
+            max-width: 450px;
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 6px solid var(--pure-white);
+            transition: var(--transition-smooth);
         }
 
-        .align-right {
-            float: right;
-            margin-left: 30px;
-        }
-
-        .align-left {
+        .img-float.left {
             float: left;
-            margin-right: 30px;
+            margin: 0 35px 20px 0;
         }
 
-        @media (max-width: 850px) {
-            .lesson-image-wrapper {
-                width: 100%;
-                float: none;
-                margin: 0 0 25px 0;
-            }
+        .img-float.right {
+            float: right;
+            margin: 0 0 20px 35px;
         }
 
-        .img-fluid {
+        .img-float img {
             width: 100%;
             display: block;
             height: auto;
             object-fit: cover;
         }
 
-        /* RESALTADO PERSONALIZADO */
+        /* Texto y Listas */
+        p {
+            margin-bottom: 20px;
+            text-align: justify;
+            font-size: 1.05rem;
+        }
+
+        p.normal {
+            text-align: left;
+        }
+
+        ul {
+            list-style: none;
+            margin: 25px 0;
+            padding: 0;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        li::before {
+            content: "";
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--secondary-blue);
+            border-radius: 2px;
+            margin-right: 12px;
+            margin-bottom: 2px;
+        }
+
+        /* --- MOTOR DE RESALTADO --- */
         .user-highlight {
             cursor: pointer;
             border-radius: 4px;
             padding: 1px 0;
             font-weight: 700;
             color: #000;
-            transition: background-color 0.3s;
-            box-decoration-break: clone;
-            -webkit-box-decoration-break: clone;
+            transition: background 0.2s;
         }
 
-        .user-highlight:hover {
-            filter: brightness(0.9);
-        }
-
-        /* FLASHCARDS */
-        .study-grid {
+        /* --- FLASHCARDS --- */
+        .flashcard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
             margin: 40px 0;
             clear: both;
         }
 
         .flashcard {
-            perspective: 1000px;
-            height: 160px;
+            perspective: 2000px;
+            height: 200px;
             cursor: pointer;
         }
 
@@ -192,11 +223,9 @@
             position: relative;
             width: 100%;
             height: 100%;
-            text-align: center;
-            transition: transform 0.5s;
+            transition: transform 0.6s;
             transform-style: preserve-3d;
-            border-radius: 15px;
-            border: 1px solid #eee;
+            border-radius: 18px;
         }
 
         .flashcard.flipped .flashcard-inner {
@@ -213,660 +242,1790 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            border-radius: 15px;
-            font-weight: 700;
+            border-radius: 18px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
         }
 
         .flashcard-front {
-            background: #f8fafc;
-            color: var(--primary);
+            background: var(--pure-white);
+            color: var(--primary-blue);
+            text-align: center;
         }
 
         .flashcard-back {
-            background: var(--secondary);
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
             color: white;
             transform: rotateY(180deg);
-            font-style: italic;
-        }
-
-        /* JUEGOS */
-        .game-wrapper {
-            background: white;
-            border-radius: 35px;
-            padding: 50px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e2e8f0;
-            text-align: center;
-            margin-top: 50px;
-            min-height: 450px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            clear: both;
-        }
-
-        .input-name {
-            padding: 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 350px;
-            margin-bottom: 25px;
-            font-size: 1.1rem;
-            text-align: center;
-            outline: none;
-        }
-
-        .btn-action {
-            padding: 18px 45px;
-            border-radius: 100px;
-            border: none;
-            background: var(--secondary);
-            color: white;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
-
-        .btn-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
-        }
-
-        /* Nav Móvil */
-        .mobile-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            height: 80px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            border-top: 1px solid #eee;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text);
-            font-size: 0.7rem;
-            font-weight: 800;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 33%;
-        }
-
-        .nav-item svg {
-            width: 26px;
-            height: 26px;
-            margin-bottom: 5px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2.5;
-        }
-
-        .nav-item:hover {
-            color: var(--secondary);
-        }
-
-        /* Sheets */
-        .bottom-sheet {
-            position: fixed;
-            bottom: -100%;
-            left: 0;
-            right: 0;
-            background: white;
-            z-index: 2000;
-            padding: 40px;
-            border-radius: 35px 35px 0 0;
-            box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.3);
-            transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
         }
 
-        .bottom-sheet.active {
-            bottom: 0;
-        }
-
-        .color-circles {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 25px 0;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .color-opt {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 4px solid #f1f5f9;
-            transition: 0.3s;
-        }
-
-        .color-opt:hover {
-            transform: scale(1.1);
-            border-color: var(--secondary);
-        }
-
-        .btn-delete-all {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #fee2e2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 4px solid #fecaca;
-            transition: 0.3s;
-            color: var(--error);
-        }
-
-        .btn-delete-all:hover {
-            background: var(--error);
-            color: white;
-            transform: scale(1.1);
-        }
-
+        /* --- MENÚS DESPLEGABLES (SHEETS) --- */
         .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 1500;
             display: none;
+            backdrop-filter: blur(4px);
         }
 
         .overlay.active {
             display: block;
         }
 
-        .toast {
+        .bottom-sheet {
             position: fixed;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: white;
-            padding: 15px 35px;
-            border-radius: 50px;
-            z-index: 9999;
-            font-weight: 800;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            font-size: 0.9rem;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background: var(--pure-white);
+            z-index: 2100;
+            padding: 35px 20px;
+            border-radius: 30px 30px 0 0;
+            transition: bottom 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            text-align: center;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
         }
 
-        footer {
-            background: var(--primary);
+        .bottom-sheet.active {
+            bottom: 0;
+        }
+
+        .sheet-title {
+            color: var(--primary-blue);
+            margin-bottom: 25px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .color-dot {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid #eee;
+            transition: 0.2s;
+        }
+
+        .color-dot:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-sheet-opt {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 12px;
+            font-weight: 700;
+            text-align: left;
+            transition: 0.3s;
+        }
+
+        .btn-sheet-opt:hover {
+            background: var(--secondary-blue);
             color: white;
-            padding: 80px 20px;
+            border-color: var(--secondary-blue);
+        }
+
+        /* --- EVALUACIÓN KAHOOT --- */
+        .quiz-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #46178f;
+            z-index: 2000000;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+            overflow: hidden;
+            color: white;
+        }
+
+        .quiz-overlay.active {
+            display: flex;
+        }
+
+        .exit-quiz-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            z-index: 2000010;
+            transition: 0.3s;
+        }
+
+        .kahoot-question-box {
+            background: white;
+            color: #333;
+            width: 100%;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
             text-align: center;
         }
 
-        .hidden {
-            display: none;
+        .timer-circle {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 20px auto;
+            border: 4px solid white;
         }
 
-        /* Estilo para los bloques que guardan contenido */
-        .highlight-content {
-            display: block;
-        }
-
-        /* CONTENEDOR BASE */
-
-        .video-container {
-            position: relative;
-            width: 90%;
-            /* 🔥 más pequeño */
-            margin: auto;
-            /* centra */
-            border: 3px solid red;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        /* proporción */
-        .video-container.horizontal {
-            padding-top: 56.25%;
-        }
-
-        .video-container.vertical {
-            padding-top: 177.78%;
-        }
-
-        /* iframe */
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .kahoot-answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             width: 100%;
-            height: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .kh-btn {
+            display: flex;
+            align-items: center;
+            padding: 25px;
             border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-align: left;
+            min-height: 100px;
+            transition: transform 0.1s;
+        }
+
+        .kh-btn .shape {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .kh-red {
+            background: var(--kh-red);
+        }
+
+        .kh-blue {
+            background: var(--kh-blue);
+        }
+
+        .kh-yellow {
+            background: var(--kh-yellow);
+        }
+
+        .kh-black {
+            background: var(--kh-black);
+        }
+
+        .kh-btn.correct {
+            background: #66bf39 !important;
+            border: 4px solid white;
+        }
+
+        .kh-btn.wrong {
+            background: #ff3355 !important;
+            opacity: 0.6;
+        }
+
+        .report-card {
+            background: var(--pure-white);
+            border: 12px double var(--accent-gold);
+            padding: 50px 30px;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin: auto;
+            color: var(--text-dark);
+        }
+
+        .report-score {
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            margin: 15px 0;
+        }
+
+        .student-name-final {
+            font-family: 'Lora', serif;
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--accent-gold);
+            display: inline-block;
+            padding: 0 10px;
+            margin: 15px 0;
+        }
+
+        /* --- BARRA PILL CENTRAL --- */
+        .nav-pill-wrapper {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .nav-pill {
+            background: var(--nav-dark);
+            height: 75px;
+            min-width: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-radius: 50px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #9ca3af;
+            font-size: 0.65rem;
+            font-weight: 800;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: 0.2s;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 3px;
+        }
+
+        .nav-item.center-btn {
+            background: var(--secondary-blue);
+            color: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-top: -55px;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+            border: 5px solid var(--nav-dark);
+        }
+
+        .nav-item:hover {
+            color: white;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #64748b;
+            padding: 80px 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .img-float {
+                float: none !important;
+                width: 100% !important;
+                margin: 0 0 20px 0 !important;
+            }
+
+            .kahoot-answers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-pill {
+                min-width: 90%;
+            }
         }
     </style>
 </head>
 
-<body onmouseup="captureSelection()">
+<body onmouseup="handleSelection()">
 
     <header id="top">
-        <h1 class="animate__animated animate__fadeInDown">DERECHO PROCESAL CIVIL II</h1>
-        <p class="animate__animated animate__fadeInUp italic serif-text">
-            En Derecho Procesal Civil II estudiarás cómo se desarrolla un proceso civil en la práctica, abordando las
-            etapas del juicio, la presentación de demandas, la actuación de pruebas, los recursos y la ejecución de las
-            resoluciones judiciales para la solución de conflictos entre particulares.
+        <h1 class="animate__animated animate__fadeInDown">
+            DERECHO PROCESAL II
+        </h1>
+        <p class="animate__animated animate__fadeInUp" style="opacity: 0.8; font-weight: 500;">
+            FORMACIÓN JURÍDICA DE ÉLITE
         </p>
     </header>
-
-    <div id="toast-msg" class="toast animate__animated"></div>
 
     <div class="container">
         <!-- UNIDAD 1 -->
         <section id="u1">
-            <h2 class="full-width-title">01. Resoluciones Judiciales</h2>
+            <h2 class="title-banner">
+                01. Resoluciones Judiciales
+            </h2>
 
-            <div class="lesson-card" id="card-u1">
-
-                <!-- IMAGEN PRINCIPAL -->
-                <div class="lesson-image-wrapper align-right">
-                    <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80"
-                        class="img-fluid" alt="Resoluciones Judiciales">
+            <!-- Bloque 1: Imagen a la izquierda -->
+            <div class="lesson-block">
+                <div class="img-float left">
+                    <img src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=800&q=80"
+                        style="height: 350px;" alt="Biblioteca">
                 </div>
 
-                <div class="highlight-content" id="content-u1">
-
-                    <h3>¿Qué son las resoluciones judiciales?</h3>
-                    <p>
-                        Son las decisiones que emite la autoridad judicial dentro de un proceso civil para dirigir,
-                        ordenar o resolver un conflicto entre las partes. Estas decisiones tienen carácter obligatorio y
-                        forman parte fundamental del desarrollo del proceso.
-                    </p>
-
-                    <br>
-
-                    <h3>¿Por qué son importantes?</h3>
-                    <p>
-                        Las resoluciones judiciales permiten que el proceso avance de manera ordenada, garantizan el
-                        debido proceso, aseguran la igualdad entre las partes y permiten alcanzar una solución legal al
-                        conflicto. Además, su cumplimiento es obligatorio para todas las personas e instituciones.
-                        :contentReference[oaicite:0]{index=0}
-                    </p>
-
-                    <br>
-
-                    <h3>¿Qué requisitos deben cumplir?</h3>
-                    <p>
-                        Toda resolución judicial debe estar fundamentada en la ley, ser clara, precisa y emitirse dentro
-                        de los plazos establecidos. Además, debe respetar principios como la legalidad, la celeridad, la
-                        igualdad procesal y la búsqueda de la verdad material dentro del proceso.
-                        :contentReference[oaicite:1]{index=1}
-                    </p>
-
-                    <br>
-
-                    <!-- IMAGEN INTERMEDIA -->
-                    <div class="lesson-image-wrapper align-left" contenteditable="false">
-                        <img src="https://img.freepik.com/foto-gratis/hombre-haciendo-su-proximo-movimiento_53876-64862.jpg?semt=ais_incoming&w=740&q=80"
-                            class="img-fluid" alt="Proceso Judicial">
-                    </div>
-
-                    <h3>Clasificación de las resoluciones judiciales</h3>
-                    <p>
-                        En el proceso civil boliviano existen tres tipos principales de resoluciones:
-                    </p>
-
-                    <p>
-                        <b>Providencias:</b> Son decisiones simples que impulsan el proceso.<br>
-                        <b>Autos:</b> Resuelven cuestiones importantes dentro del proceso.<br>
-                        <b>Sentencias:</b> Resuelven el conflicto principal y ponen fin al proceso.
-                    </p>
-
-                    <br>
-
-                    <h3>¿Por qué son obligatorias?</h3>
-                    <p>
-                        Las resoluciones judiciales deben ser cumplidas por todas las personas, ya que tienen fuerza
-                        legal. En caso de incumplimiento, la autoridad judicial puede disponer medidas como sanciones o
-                        el uso de la fuerza pública para garantizar su ejecución. :contentReference[oaicite:2]{index=2}
-                    </p>
-
-                </div>
-
+                <!-- <h3 class="subtitle-banner">
+                    ¿Qué es una resolución judicial?
+                </h3> -->
+                <p>
+                    Las resoluciones judiciales son decisiones que toma el juez dentro de un proceso, ya sea para hacer
+                    avanzar el trámite o para resolver el conflicto entre las partes.
+                </p>
+                <h3>
+                    Características principales
+                </h3>
+                <ul>
+                    <li>
+                        Es un acto procesal (forma parte del juicio)
+                    </li>
+                    <li>
+                        Es emitida por una autoridad judicial competente
+                    </li>
+                    <li>
+                        Debe ser fundada y motivada (explicar el porqué de la decisión)
+                    </li>
+                    <li>
+                        Tiene efectos jurídicos obligatorios para las partes
+                    </li>
+                    <li>
+                        Puede ser impugnada mediante recursos (apelación, casación, etc.)
+                    </li>
+                </ul>
             </div>
 
-            <div id="game-1" class="game-wrapper"></div>
-        </section>
+            <!-- Bloque 2: Imagen a la derecha -->
+            <div class="lesson-block">
+                <p>Toda resolución judicial debe estar impregnada de los principios de congruencia y motivación. Esto
+                    significa que el juez debe responder puntualmente a lo solicitado y fundamentar su decisión en
+                    hechos y normas, protegiendo así la seguridad jurídica.</p>
+            </div>
+            <!-- Bloque 3: Imagen a la derecha -->
+            <div class="lesson-block">
+                <div class="img-float right">
+                    <img src="https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&w=800&q=80"
+                        style="height: 460px;" alt="Firma">
+                </div>
 
+                <h3 class="subtitle-banner">
+                    Clasificación (según el Código Procesal Civil)
+                </h3>
+
+                <ul>
+                    <li><strong>Providencias (Art. 209):</strong> Son resoluciones que ordenan actos simples y de mero
+                        trámite para el desarrollo del proceso.</li>
+
+                    <li><strong>Autos interlocutorios (Art. 210):</strong> Son resoluciones que deciden cuestiones que
+                        surgen durante la tramitación del proceso.</li>
+
+                    <li><strong>Autos definitivos (Art. 211):</strong> Son resoluciones que ponen fin al proceso sin
+                        resolver el fondo del conflicto.</li>
+
+                    <li><strong>Sentencia (Art. 213):</strong> Es la resolución que pone fin al litigio resolviendo el
+                        fondo del conflicto entre las partes.</li>
+
+                    <li><strong>Auto de Vista (Art. 218):</strong> Es la resolución de segunda instancia que revisa la
+                        sentencia u otras decisiones del juez inferior.</li>
+
+                    <li><strong>Auto Supremo (Art. 219):</strong> Es la resolución emitida por el Tribunal Supremo de
+                        Justicia en última instancia.</li>
+                </ul>
+            </div>
+            <!-- <div class="flashcard-grid">
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es una resolución judicial?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Son decisiones que toma el juez dentro de un proceso, ya sea para hacer avanzar el
+                                trámite o para resolver el conflicto entre las partes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Cuáles son las características principales de las resoluciones judiciales?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                • Es un acto procesal.<br>
+                                • Emitida por autoridad competente.<br>
+                                • Fundada y motivada.<br>
+                                • Efectos obligatorios.<br>
+                                • Puede ser impugnada.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es una Providencia (Art. 209)?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Son resoluciones que ordenan actos simples y de mero trámite para el desarrollo del
+                                proceso.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué son los Autos interlocutorios (Art. 210)?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Son resoluciones que deciden cuestiones que surgen durante la tramitación del proceso.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué son los Autos definitivos (Art. 211)?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Son resoluciones que ponen fin al proceso sin resolver el fondo del conflicto.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es la Sentencia (Art. 213)?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es la resolución que pone fin al litigio resolviendo el fondo del conflicto entre las
+                                partes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es un Auto de Vista (Art. 218)?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es la resolución de segunda instancia que revisa la sentencia u otras decisiones del
+                                juez inferior.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es un Auto Supremo (Art. 219)?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es la resolución emitida por el Tribunal Supremo de Justicia en última instancia.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es el Tribunal Supremo de Justicia?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es la autoridad judicial que emite el <strong>Auto Supremo (Art. 219)</strong> en última
+                                instancia.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <button onclick="openQuiz('u1')"
+                    style="padding: 20px 60px; border-radius: 50px; background: var(--secondary-blue); color: white; border: none; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px rgba(37,99,235,0.3);">EVALUACIÓN
+                    KAHOOT</button>
+            </div> -->
+        </section>
 
         <!-- UNIDAD 2 -->
         <section id="u2">
-            <h2 class="full-width-title alt">02. El Proceso Administrativo</h2>
-            <div class="lesson-card" id="card-u2">
-                <div class="lesson-image-wrapper align-left" contenteditable="false">
-                    <img src="https://images.unsplash.com/photo-1454165833767-027508493b2a?auto=format&fit=crop&w=800&q=80"
-                        class="img-fluid" alt="Planeación">
+            <h2 class="title-banner">02. Recursos Judiciales</h2>
+
+            <div class="lesson-block">
+                <div class="img-float right">
+                    <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&q=80"
+                        style="height: 200px;" alt="Juez">
                 </div>
-                <div class="highlight-content" id="content-u2">
-                    <p>El proceso administrativo es un ciclo interactivo que garantiza la armonía de una empresa. Se
-                        compone de cuatro etapas esenciales: Planeación, Organización, Dirección y Control. La
-                        Planeación define el "qué se quiere hacer" y establece los objetivos. La Organización diseña el
-                        "cómo se va a hacer", asignando recursos y creando la estructura jerárquica necesaria para la
-                        ejecución.</p>
-                    <br>
-                    <p>Le sigue la Dirección, que es la fase dinámica donde el líder motiva al equipo para que los
-                        planes se conviertan en realidad. Finalmente, el Control mide el desempeño y lo compara con lo
-                        planeado originalmente. Sin esta etapa de cierre, la administración sería ciega ante los
-                        errores. Un administrador profesional vive dentro de este ciclo, corrigiendo desviaciones y
-                        optimizando recursos en tiempo real.</p>
+
+                <p>
+                    Los recursos judiciales son medios que tienen las partes para impugnar una decisión judicial
+                    cuando consideran que no es justa o contiene errores.
+                </p>
+                <p>
+                    Si una decisión no es correcta, se puede iniciar un proceso recursivo mediante los recursos
+                    judiciales,
+                    los cuales buscan corregir errores en las resoluciones emitidas por jueces o tribunales.
+                </p>
+                <div class="img-float left">
+                    <img src="https://cards.algoreducation.com/_next/image?url=https%3A%2F%2Ffiles.algoreducation.com%2Fproduction-ts%2F__S3__0c5368b0-0090-436f-bc19-68f2f1ce0431&w=3840&q=75"
+                        style="height: 230px;" alt="Juez">
                 </div>
-                <br>
-                <a href="https://www.youtube.com/watch?v=P6N_2EIsGsw" target="_blank" class="btn-action"
-                    style="background: #ff0000; text-decoration: none; display: inline-block;">Ver Clase en YouTube</a>
+                <h3>Requisitos</h3>
+                <ul>
+                    <li><strong>Objeto:</strong> Se pueden plantear contra resoluciones judiciales (sentencias, autos,
+                        etc.).</li>
+                    <li><strong>Legitimación:</strong> Solo pueden interponerlos las partes del proceso.</li>
+                    <li><strong>Plazo:</strong> Deben presentarse dentro de un plazo legal establecido.</li>
+                    <li><strong>Agravio:</strong> La parte que interpone el recurso debe estar afectada por la decisión.
+                    </li>
+                </ul>
             </div>
-            <div id="game-2" class="game-wrapper"></div>
+            <div class="lesson-block">
+                <div class="img-float right">
+                    <img src="https://www.argentinaproduct.com/ckfinder/userfiles/files/blog/blog-persona-jur.jpg"
+                        style="height: 650px;" alt="Juez">
+                </div>
+                <h3>¿Qué es el agravio?</h3>
+                <p>
+                    El agravio es el perjuicio o daño que sufre una de las partes como consecuencia de una resolución
+                    judicial.
+                    Es el fundamento principal para poder interponer un recurso.
+                </p>
+
+                <h3>Clases de recursos judiciales</h3>
+                <ul>
+                    <li><strong>Recurso de reposición:</strong> Busca que el mismo juez corrija su decisión.</li>
+
+                    <li><strong>Recurso de reposición con alternativa de apelación:</strong> Se pide primero la
+                        reposición y,
+                        si es rechazada, se eleva a un tribunal superior.</li>
+
+                    <li><strong>Recurso de apelación:</strong> Permite que un tribunal superior revise la decisión.</li>
+
+                    <li><strong>Recurso de casación (fondo):</strong> Busca corregir errores en la aplicación del
+                        derecho.</li>
+
+                    <li><strong>Recurso de nulidad (forma):</strong> Busca corregir errores en el procedimiento.</li>
+
+                    <li><strong>Recurso de compulsa:</strong> Se presenta cuando se niega indebidamente un recurso.</li>
+
+                    <li><strong>Recurso de revisión extraordinaria:</strong> Permite revisar una sentencia firme en
+                        casos excepcionales.</li>
+                </ul>
+            </div>
+            <!-- <div class="flashcard-grid">
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué son los recursos judiciales?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Son medios que tienen las partes para impugnar una decisión judicial cuando consideran
+                                que no es justa o contiene errores.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Para qué sirven los recursos judiciales?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Sirven para corregir errores en las resoluciones emitidas por jueces o tribunales.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué requisito deben cumplir los recursos?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Deben interponerse contra resoluciones judiciales dentro de un plazo legal y por las
+                                partes afectadas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Quiénes pueden interponer un recurso?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Solo las partes del proceso que se vean afectadas por la decisión judicial.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es el agravio?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es el perjuicio o daño que sufre una parte por una resolución judicial y que justifica
+                                la interposición del recurso.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es el recurso de reposición?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es el recurso que busca que el mismo juez corrija su propia decisión.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es la apelación?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es el recurso que permite que un tribunal superior revise la decisión de un juez.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es la casación?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es el recurso que busca corregir errores en la aplicación del derecho en una resolución
+                                judicial.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es el recurso de nulidad?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es el recurso que busca corregir errores en el procedimiento o forma del proceso.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es el recurso de compulsa?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es el recurso que se presenta cuando se niega indebidamente otro recurso.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h4>¿Qué es la revisión extraordinaria?</h4>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="normal">
+                                Es un recurso excepcional que permite revisar una sentencia firme en casos especiales.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="openQuiz('u2')"
+                    style="padding: 20px 60px; border-radius: 50px; background: var(--secondary-blue); color: white; border: none; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px rgba(37,99,235,0.3);">EVALUACIÓN
+                    KAHOOT</button>
+            </div> -->
+        </section>
+        <section id="u3">
+            <h2 class="title-banner">03. Recurso de Reposición</h2>
+
+            <div class="lesson-block">
+
+                <div class="img-float right">
+                    <img src="https://www.argentinaproduct.com/ckfinder/userfiles/files/blog/blog-persona-jur.jpg"
+                        style="height: 350px;" alt="Juez">
+                </div>
+
+                <h3>¿Qué es el recurso de reposición?</h3>
+                <p>
+                    El recurso de reposición es un medio de impugnación que permite que el mismo juez o magistrado
+                    revise una decisión que él mismo dictó, con el objetivo de corregir errores sin necesidad de acudir
+                    a un tribunal superior.
+                </p>
+
+                <p>
+                    En otras palabras, es una forma de decirle al juez: “revise su decisión, porque me está
+                    perjudicando”.
+                </p>
+
+                <h3>¿Por qué existe este recurso?</h3>
+                <p>
+                    Este recurso existe porque durante el proceso pueden ocurrir errores en decisiones de trámite.
+                    En lugar de acudir inmediatamente a un tribunal superior, la ley permite que el mismo juez
+                    corrija su error de manera rápida.
+                </p>
+
+                <div class="img-float left">
+                    <img src="https://repositorio-uapa.cuaed.unam.mx/repositorio/moodle/pluginfile.php/3129/mod_resource/content/1/UAPA-Norma-Juridica-Caracteristicas-Clasificacion/img/cont/02_norma.jpg"
+                        style="height: 510px;" alt="Juez">
+                </div>
+
+                <h3>Facultad del juez o magistrado</h3>
+                <p>
+                    El juez o magistrado tiene la facultad de modificar su propia decisión. Esto puede ocurrir de dos
+                    formas:
+                </p>
+                <ul>
+                    <li><strong>De oficio:</strong> cuando el propio juez se da cuenta del error y lo corrige.</li>
+                    <li><strong>A petición de parte:</strong> cuando una de las partes solicita la revisión mediante el
+                        recurso.</li>
+                </ul>
+
+                <h3>¿Contra qué resoluciones procede?</h3>
+                <p>
+                    El recurso de reposición no se aplica a todas las resoluciones, solo a aquellas que forman parte del
+                    trámite del proceso:
+                </p>
+                <ul>
+                    <li><strong>Providencias:</strong> decisiones simples que hacen avanzar el proceso.</li>
+                    <li><strong>Autos interlocutorios:</strong> decisiones que resuelven aspectos dentro del proceso,
+                        pero no el conflicto principal.</li>
+                </ul>
+
+                <p>
+                    No procede contra sentencias, porque estas resuelven el fondo del conflicto y requieren recursos más
+                    complejos como la apelación.
+                </p>
+
+                <div class="img-float right">
+                    <img src="https://blog.hernandez-vilches.com/wp-content/uploads/De-las-normas-jurC3ADdicas-su-aplicaciC3B3n-y-eficacia.jpg"
+                        style="height: 470px;" alt="Juez">
+                </div>
+
+                <h3>¿En qué momento se puede usar?</h3>
+                <p>
+                    Se puede utilizar en cualquier etapa del proceso, siempre que la resolución sea de trámite.
+                    Esto significa que no importa si el proceso está iniciando o avanzando, el recurso sigue siendo
+                    válido.
+                </p>
+
+                <h3>Plazos (muy importante)</h3>
+                <p>
+                    El tiempo para presentar este recurso depende de cómo se emitió la resolución:
+                </p>
+
+                <ul>
+                    <li>
+                        <strong>Si la resolución se dicta en audiencia:</strong>
+                        el recurso debe interponerse inmediatamente, en ese mismo momento.
+                        Si no se reclama en ese instante, se pierde el derecho.
+                    </li>
+
+                    <li>
+                        <strong>Si la resolución es escrita:</strong>
+                        el recurso debe presentarse dentro de los 3 días siguientes a la notificación.
+                    </li>
+                </ul>
+
+                <p>
+                    El plazo es fundamental, porque si se deja pasar, la resolución queda firme y ya no puede ser
+                    impugnada por este medio.
+                </p>
+
+                <div class="img-float left">
+                    <img src="https://www.rigobertoparedes.com/wp-content/uploads/2015/12/derecho-civil.png"
+                        style="height: 580px;" alt="Juez">
+                </div>
+
+                <h3>¿Quién resuelve el recurso?</h3>
+                <p>
+                    A diferencia de otros recursos, aquí no interviene un tribunal superior.
+                    El mismo juez o magistrado que dictó la resolución es quien debe revisarla y decidir.
+                </p>
+
+                <h3>¿Qué puede decidir el juez?</h3>
+                <p>
+                    El juez, al analizar el recurso, puede tomar tres decisiones:
+                </p>
+                <ul>
+                    <li><strong>Confirmar:</strong> mantener su decisión original.</li>
+                    <li><strong>Modificar parcialmente:</strong> cambiar solo una parte de la resolución.</li>
+                    <li><strong>Revocar totalmente:</strong> dejar sin efecto toda la decisión.</li>
+                </ul>
+
+                <h3>¿Qué pasa después?</h3>
+                <p>
+                    Una vez que el juez resuelve el recurso de reposición, si la parte sigue inconforme,
+                    no puede volver a usar este mismo recurso.
+                </p>
+
+                <p>
+                    La única opción que queda es acudir a un tribunal superior mediante el recurso de apelación.
+                </p>
+
+                <h3>Idea clave para memorizar</h3>
+                <p>
+                    El recurso de reposición es un mecanismo rápido para corregir errores del juez en decisiones de
+                    trámite,
+                    sin subir a otra instancia.
+                </p>
+
+                <div class="img-float right">
+                    <img src="https://elanlegal.com.mx/wp-content/uploads/2025/02/1-Derecho-mercantil-y-civil.jpg"
+                        style="height: 380px;" alt="Juez">
+                </div>
+
+                <h3>¿Qué es la expresión de agravios?</h3>
+                <p>
+                    La expresión de agravios es el acto mediante el cual la parte que interpone un recurso
+                    explica de manera clara y fundamentada cuál es el perjuicio (agravio) que le causa
+                    la resolución judicial.
+                </p>
+
+                <p>
+                    No basta con decir que una decisión es injusta, sino que se debe indicar:
+                </p>
+
+                <ul>
+                    <li>Qué parte de la resolución está mal.</li>
+                    <li>Por qué está mal (fundamento jurídico).</li>
+                    <li>Cómo le perjudica esa decisión.</li>
+                </ul>
+
+                <p>
+                    Si no se presenta la expresión de agravios, el recurso puede ser rechazado,
+                    ya que no se demuestra el daño causado por la resolución.
+                </p>
+
+                <div class="img-float left">
+                    <img src="https://www.alvesjacob.com/images/resource/about-4.jpg" style="height: 225px;" alt="Juez">
+                </div>
+
+                <h3>¿Cuáles son los efectos de los recursos?</h3>
+                <p>
+                    Cuando se interpone un recurso, este puede producir distintos efectos jurídicos
+                    sobre la resolución impugnada. Los principales efectos son tres:
+                </p>
+
+                <ul>
+                    <li><strong>Efecto suspensivo</strong></li>
+                    <li><strong>Efecto devolutivo</strong></li>
+                    <li><strong>Efecto diferido</strong></li>
+                </ul>
+
+                <div class="img-float right">
+                    <img src="https://i0.wp.com/fc-abogados.com/wp-content/uploads/2021/11/Diseno-sin-titulo-33.png?fit=590%2C332&ssl=1"
+                        style="height: 725px;" alt="Juez">
+                </div>
+
+                <h3>1. Efecto suspensivo</h3>
+                <p>
+                    En este efecto, la ejecución de la resolución queda suspendida,
+                    es decir, no se puede cumplir la decisión del juez mientras el recurso esté en trámite.
+                </p>
+
+                <p>
+                    Ejemplo:
+                    Si una sentencia ordena el pago de dinero, con efecto suspensivo no se puede exigir el pago
+                    hasta que el tribunal superior resuelva el recurso.
+                </p>
+
+                <h3>2. Efecto devolutivo</h3>
+                <p>
+                    En este caso, el recurso se eleva a un tribunal superior para su revisión,
+                    pero la resolución sigue vigente y puede ejecutarse.
+                </p>
+
+                <p>
+                    Es decir, el proceso continúa y la decisión del juez se cumple,
+                    aunque esté siendo revisada.
+                </p>
+
+                <p>
+                    Ejemplo:
+                    Se apela una decisión, pero esta sigue produciendo efectos mientras el tribunal la revisa.
+                </p>
+
+                <h3>3. Efecto diferido</h3>
+                <p>
+                    En este efecto, el recurso no se resuelve de inmediato,
+                    sino que su análisis se posterga hasta un momento posterior del proceso,
+                    generalmente junto con la sentencia final.
+                </p>
+
+                <p>
+                    Su finalidad es evitar retrasos innecesarios en el proceso por decisiones intermedias.
+                </p>
+
+                <p>
+                    Ejemplo:
+                    Una parte impugna una decisión durante el proceso, pero el juez decide que se resolverá
+                    junto con la sentencia final.
+                </p>
+
+            </div>
+        </section>
+        <section id="u4">
+            <h2 class="title-banner">04. Recurso Diferido</h2>
+
+            <div class="lesson-block">
+
+                <div class="img-float right">
+                    <img src="https://agora.universitasfundacion.com/wp-content/uploads/2023/10/balanza-justicia-equilibrio.jpg"
+                        style="height: 320px;" alt="Juez">
+                </div>
+
+                <h3>¿Qué es el recurso diferido?</h3>
+                <p>
+                    El recurso diferido es un medio de impugnación mediante el cual una decisión judicial
+                    no se revisa de manera inmediata, sino que su análisis se posterga hasta un momento posterior,
+                    generalmente junto con la sentencia final del proceso.
+                </p>
+
+                <p>
+                    Su finalidad es evitar retrasos innecesarios en el proceso por la impugnación de decisiones
+                    intermedias.
+                </p>
+
+                <h3>¿Cuándo se aplica?</h3>
+                <p>
+                    Se aplica cuando se impugnan decisiones que no son fundamentales para detener el proceso,
+                    por lo que se permite que el juicio continúe normalmente y el reclamo se resuelva después.
+                </p>
+
+                <div class="img-float left">
+                    <img src="https://www.ambitojuridico.com/sites/default/files/node/deflt/field_image/1970-01/derecho-justicia-leybigstock-1509241648.jpg"
+                        style="height: 320px;" alt="Juez">
+                </div>
+
+                <h3>Etapas relacionadas (actividad probatoria)</h3>
+                <p>
+                    El recurso diferido suele vincularse con decisiones sobre la prueba dentro del proceso.
+                    Estas decisiones siguen etapas como:
+                </p>
+
+                <ul>
+                    <li><strong>Ofrecimiento de la prueba:</strong> Las partes presentan los medios probatorios.</li>
+                    <li><strong>Admisión o rechazo:</strong> El juez acepta o rechaza las pruebas ofrecidas.</li>
+                    <li><strong>Producción de la prueba:</strong> Se realiza el interrogatorio o actuación probatoria.
+                    </li>
+                    <li><strong>Auto interlocutorio:</strong> El juez emite una decisión sobre estas cuestiones.</li>
+                </ul>
+
+                <div class="img-float right">
+                    <img src="https://e01-expansion.uecdn.es/assets/multimedia/imagenes/2019/04/12/15550800990306.jpg"
+                        style="height: 480px;" alt="Juez">
+                </div>
+
+                <h3>¿Qué ocurre con el recurso?</h3>
+                <p>
+                    Cuando se interpone un recurso diferido, este queda “congelado”,
+                    es decir, no se resuelve inmediatamente.
+                </p>
+
+                <p>
+                    El proceso continúa normalmente hasta que el juez dicta la sentencia.
+                </p>
+
+                <h3>¿Cuándo se resuelve?</h3>
+                <p>
+                    El recurso diferido se resuelve cuando se emite la sentencia o en la instancia superior,
+                    momento en el cual se analiza junto con el resto del proceso.
+                </p>
+
+                <h3>Características importantes</h3>
+                <ul>
+                    <li>No suspende el proceso.</li>
+                    <li>Evita retrasos innecesarios.</li>
+                    <li>Se acumula para ser resuelto posteriormente.</li>
+                    <li>Generalmente está vinculado a decisiones sobre prueba.</li>
+                </ul>
+
+                <div class="img-float left">
+                    <img src="https://www.hayderecho.com/wp-content/uploads/2021/07/hammer-719066__340-453x321.jpg"
+                        style="height: 200px;" alt="Juez">
+                </div>
+
+                <h3>Importancia</h3>
+                <p>
+                    Permite que el proceso sea más rápido y eficiente, evitando que cada decisión intermedia
+                    sea revisada inmediatamente, lo que podría paralizar el juicio.
+                </p>
+
+                <h3>Idea clave</h3>
+                <p>
+                    El recurso diferido no se resuelve en el momento, se guarda para ser analizado después,
+                    normalmente junto con la sentencia final.
+                </p>
+            </div>
+        </section>
+        <section id="u5">
+            <h2 class="title-banner">05. Recurso de Compulsa (Queja)</h2>
+
+            <div class="lesson-block">
+
+                <div class="img-float right">
+                    <img src="https://realestatemarket.com.mx/images/2020/10-Octubre/1210/El_Notario_como_auxiliar_en_la_administracin_de_justicia_p_3.jpg"
+                        style="height: 190px;" alt="Juez">
+                </div>
+
+                <h3>¿Qué es el recurso de compulsa?</h3>
+                <p>
+                    El recurso de compulsa, también llamado recurso de queja, es un medio de impugnación que se utiliza
+                    cuando una autoridad judicial niega indebidamente la concesión de un recurso (por ejemplo, apelación
+                    o casación).
+                </p>
+
+                <p>
+                    En otras palabras, es una forma de reclamar ante un tribunal superior cuando el juez no permite
+                    que tu recurso sea revisado.
+                </p>
+
+                <div class="img-float left">
+                    <img src="https://centrofranciscolopez.es/wp-content/uploads/2022/03/funciones-de-los-cuerpos-de-la-administracion-de-justicia.jpg"
+                        style="height: 370px;" alt="Juez">
+                </div>
+
+                <h3>¿Cómo funciona?</h3>
+                <p>
+                    Cuando el juez rechaza un recurso que sí debía conceder, la parte afectada puede acudir directamente
+                    al tribunal superior mediante el recurso de compulsa.
+                </p>
+
+                <ul>
+                    <li>Se presenta ante el tribunal superior.</li>
+                    <li>El tribunal revisa si el juez actuó correctamente o no.</li>
+                    <li>Si el juez actuó mal, se ordena que el recurso sea admitido.</li>
+                </ul>
+
+                <h3>Resultado del recurso</h3>
+                <ul>
+                    <li><strong>Procedente:</strong> el tribunal ordena que se conceda el recurso negado.</li>
+                    <li><strong>Improcedente:</strong> se confirma que el juez actuó correctamente.</li>
+                </ul>
+
+                <div class="img-float right">
+                    <img src="https://www.hayderecho.com/wp-content/uploads/2021/07/hammer-719066__340-453x321.jpg"
+                        style="height: 290px;" alt="Juez">
+                </div>
+
+                <h3>Importante</h3>
+                <p>
+                    Este recurso no analiza el fondo del caso, solo verifica si fue correcto o incorrecto
+                    negar el recurso.
+                </p>
+
+                <h3>Multa por compulsa ilegal</h3>
+                <p>
+                    Si el recurso de compulsa es presentado sin fundamento, es decir, de manera indebida o ilegal,
+                    el tribunal puede imponer una multa a la parte que lo interpuso.
+                </p>
+
+                <p>
+                    Esto busca evitar el uso abusivo del recurso y proteger la correcta administración de justicia.
+                </p>
+            </div>
+        </section>
+        <section id="u6">
+            <h2 class="title-banner">06. Recurso de Casación</h2>
+
+            <div class="lesson-block">
+
+                <div class="img-float right">
+                    <img src="https://montevideo300.uy/wp-content/uploads/2025/10/Abogados-en-Montevideo.jpg"
+                        style="height: 340px;" alt="Juez">
+                </div>
+
+                <h3>¿Qué es el recurso de casación?</h3>
+                <p>
+                    El recurso de casación es un medio de impugnación extraordinario que se presenta ante el Tribunal
+                    Supremo de Justicia,
+                    con el objetivo de revisar si una resolución (generalmente un Auto de Vista) ha sido dictada
+                    conforme a la ley.
+                </p>
+
+                <p>
+                    No revisa hechos, sino la correcta aplicación del derecho y del procedimiento.
+                </p>
+
+                <h3>Tipos de casación</h3>
+                <ul>
+                    <li><strong>Casación en el fondo</strong></li>
+                    <li><strong>Casación en la forma</strong></li>
+                </ul>
+
+                <div class="img-float left">
+                    <img src="https://blog.lemontech.com/hs-fs/hubfs/Imported_Blog_Media/frases-de-abogados-1.jpg?width=1200&height=720&name=frases-de-abogados-1.jpg"
+                        style="height: 600px;" alt="Juez">
+                </div>
+
+                <h3>1. Casación en el fondo</h3>
+                <p>
+                    Se presenta cuando existen errores en la aplicación o interpretación de la ley.
+                </p>
+
+                <p>
+                    Es decir, el juez aplicó mal el derecho al caso concreto.
+                </p>
+
+                <h4>¿Cuándo procede?</h4>
+                <ul>
+                    <li>Aplicación incorrecta de la ley.</li>
+                    <li>Interpretación errónea de normas jurídicas.</li>
+                    <li>Valoración incorrecta de la prueba.</li>
+                </ul>
+
+                <h3>2. Casación en la forma</h3>
+                <p>
+                    Se presenta cuando existen errores en el procedimiento, es decir, en la forma en que se llevó el
+                    proceso.
+                </p>
+
+                <h4>¿Cuándo procede?</h4>
+                <ul>
+                    <li>Violación al debido proceso.</li>
+                    <li>Falta de competencia del juez.</li>
+                    <li>Omisión de etapas esenciales del proceso.</li>
+                    <li>Resoluciones sin fundamentación.</li>
+                </ul>
+
+                <div class="img-float right">
+                    <img src="https://www.acalsl.com/wp-content/uploads/2025/06/abogados-contencioso-adminsitrativo.jpg"
+                        style="height: 370px;" alt="Juez">
+                </div>
+
+                <h3>¿Cuándo se presentan juntos?</h3>
+                <p>
+                    Ambos tipos de casación (fondo y forma) pueden interponerse de manera conjunta
+                    cuando existen errores tanto en la aplicación del derecho como en el procedimiento.
+                </p>
+
+                <h3>Causales de nulidad</h3>
+                <p>
+                    Las causales de nulidad están relacionadas con errores graves en el proceso, tales como:
+                </p>
+                <ul>
+                    <li>Falta de competencia del juez.</li>
+                    <li>Violación del derecho a la defensa.</li>
+                    <li>Falta de notificación a las partes.</li>
+                    <li>Omisión de actos procesales esenciales.</li>
+                </ul>
+
+                <div class="img-float left">
+                    <img src="https://img.freepik.com/fotos-premium/tema-ley-martillo-o-martillo-juez-abogado-agentes-ejecucion-casos-basados-pruebas-tomados-cuenta-tribunal-abundan-legislacion-empresarial_265022-93372.jpg?semt=ais_incoming&w=740&q=80"
+                        style="height: 640px;" alt="Juez">
+                </div>
+
+
+                <h3>¿Qué significa “casando” en casación?</h3>
+                <p>
+                    “Casando” significa que el Tribunal Supremo anula o deja sin efecto la resolución impugnada,
+                    corrigiendo el error jurídico.
+                </p>
+
+                <p>
+                    En este caso, el Tribunal puede emitir una nueva decisión aplicando correctamente la ley.
+                </p>
+
+                <h3>¿Cómo se tramita?</h3>
+                <ul>
+                    <li>Se presenta el recurso contra el Auto de Vista.</li>
+                    <li>Se debe expresar claramente los agravios.</li>
+                    <li>El Tribunal Supremo analiza el recurso.</li>
+                    <li>Puede declarar el recurso:</li>
+                    <ul>
+                        <li><strong>Improcedente</strong></li>
+                        <li><strong>Infundado</strong></li>
+                        <li><strong>Anulatorio</strong></li>
+                        <li><strong>Casando</strong></li>
+                    </ul>
+                </ul>
+
+                <h3>Importante</h3>
+                <p>
+                    El recurso de casación no revisa nuevamente todo el caso,
+                    solo verifica si la ley fue correctamente aplicada.
+                </p>
+            </div>
+        </section>
+        <section id="u7">
+            <h2 class="title-banner">07. Revisión extraordinaria de sentencia</h2>
+
+            <div class="lesson-block">
+
+                <div class="img-float right">
+                    <img src="https://montevideo300.uy/wp-content/uploads/2025/10/Abogados-en-Montevideo.jpg"
+                        style="height: 190px;" alt="Juez">
+                </div>
+
+                <h3>¿Qué es la revisión extraordinaria de sentencia?</h3>
+                <p>
+                    Es un medio de impugnación excepcional que permite revisar una sentencia firme (con cosa juzgada),
+                    cuando existen circunstancias graves que demuestran que la decisión pudo haber sido injusta.
+                </p>
+
+                <p>
+                    A diferencia de otros recursos, este no se utiliza durante el proceso, sino después de que el caso
+                    ya terminó.
+                </p>
+
+                <div class="img-float left">
+                    <img src="https://www.diariojuridico.com/wp-content/uploads/2021/04/ley-organica-poder-judicial.jpg"
+                        style="height: 380px;" alt="Juez">
+                </div>
+
+                <h3>¿Cuándo se aplica?</h3>
+                <p>
+                    Se aplica cuando aparecen hechos nuevos o situaciones que no fueron consideradas en el proceso
+                    y que podrían cambiar el resultado de la sentencia.
+                </p>
+
+                <p>
+                    También procede cuando se demuestra que la decisión se basó en errores graves o situaciones
+                    irregulares.
+                </p>
+
+                <h3>Requisitos</h3>
+                <ul>
+                    <li>Que exista una sentencia firme (cosa juzgada).</li>
+                    <li>Que se presente ante el Tribunal Supremo de Justicia.</li>
+                    <li>Que se demuestre la existencia de una causal legal.</li>
+                    <li>Que la parte interesada haya sido afectada por la sentencia.</li>
+                </ul>
+
+                <div class="img-float right">
+                    <img src="https://userscontent2.emaze.com/images/c57df052-96cf-417d-b0a6-e60e1b5e780f/9a62b735a59ff74e53440482151af551.jpg"
+                        style="height: 290px;" alt="Juez">
+                </div>
+
+                <h3>Causales</h3>
+                <p>
+                    Este recurso solo procede en casos específicos, entre ellos:
+                </p>
+
+                <ul>
+                    <li>Cuando aparecen pruebas nuevas decisivas que no se conocían durante el proceso.</li>
+                    <li>Cuando la sentencia se basó en documentos falsos.</li>
+                    <li>Cuando existió fraude, dolo o colusión entre las partes.</li>
+                    <li>Cuando hubo error grave en la valoración de la prueba.</li>
+                    <li>Cuando se vulneraron derechos fundamentales.</li>
+                </ul>
+
+                <div class="img-float left">
+                    <img src="https://www.edarconsulting.com/wp-content/uploads/2022/02/asesoria-juridico-laboral-asesoramiento-especializado.jpg"
+                        style="height: 780px;" alt="Juez">
+                </div>
+
+                <h3>Plazos</h3>
+
+                <p>
+                    El plazo para interponer la revisión extraordinaria no es único, sino que depende del momento
+                    en que se descubre la causal que justifica el recurso.
+                </p>
+
+                <ul>
+                    <li>
+                        <strong>Desde el conocimiento de la causal:</strong>
+                        El plazo comienza a correr desde el momento en que la parte descubre el hecho que justifica la
+                        revisión
+                        (por ejemplo, una prueba nueva o un documento falso).
+                    </li>
+
+                    <li>
+                        <strong>Plazo limitado:</strong>
+                        Generalmente, la ley establece un plazo determinado (por ejemplo, 3 meses),
+                        dentro del cual debe presentarse el recurso desde ese conocimiento.
+                    </li>
+
+                    <li>
+                        <strong>Plazo máximo:</strong>
+                        Aunque se descubra la causal después, existe un límite máximo desde la sentencia,
+                        pasado el cual ya no se puede interponer el recurso.
+                    </li>
+                </ul>
+
+                <p>
+                    Esto significa que el plazo no se cuenta desde la sentencia en todos los casos,
+                    sino desde que se descubre el problema que afecta la validez de la decisión.
+                </p>
+
+                <p>
+                    Si la parte no actúa dentro del plazo, pierde el derecho a solicitar la revisión,
+                    incluso si la causal es válida.
+                </p>
+
+                <h3>Importante</h3>
+                <p>
+                    Este recurso no busca reabrir el caso por simple desacuerdo,
+                    sino corregir injusticias graves que afectan la validez de la sentencia.
+                </p>
+
+                <h3>Idea clave</h3>
+                <p>
+                    La revisión extraordinaria rompe la cosa juzgada solo en casos excepcionales
+                    y dentro de plazos estrictos.
+                </p>
+
+            </div>
         </section>
     </div>
 
-    <!-- Menú Móvil -->
-    <nav class="mobile-nav">
-        <button class="nav-item" onclick="window.location.href='../index.html'">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-            <span>HOME</span>
-        </button>
-        <button class="nav-item" onclick="triggerHighlightMenu()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
-                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
-                <path d="M2 2l5 5"></path>
-                <path d="M11 11l1 1"></path>
-            </svg>
-            <span>MARCAR</span>
-        </button>
-        <button class="nav-item" onclick="openNavTopics()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-            <span>TEMAS</span>
-        </button>
-    </nav>
-
-    <!-- Hojas -->
-    <div class="overlay" id="overlay" onclick="hideSheets()"></div>
+    <!-- OVERLAYS Y MENÚS -->
+    <div class="overlay" id="main-overlay" onclick="closeAllSheets()"></div>
 
     <div class="bottom-sheet" id="color-sheet">
-        <h3>HERRAMIENTAS DE ESTUDIO</h3>
-        <p style="opacity:0.6; margin-bottom: 10px;">Selecciona un color o borra todo</p>
-        <div class="color-circles">
-            <div class="color-opt" style="background: var(--hl-yellow);" onclick="doHighlight('var(--hl-yellow)')">
+        <h3 class="sheet-title">COLOR DE RESALTADO</h3>
+        <div style="display:flex; justify-content:center; gap:15px; margin-bottom:30px; flex-wrap: wrap;">
+            <div class="color-dot" style="background:var(--hl-yellow);" onclick="applyHighlight('var(--hl-yellow)')">
             </div>
-            <div class="color-opt" style="background: var(--hl-green);" onclick="doHighlight('var(--hl-green)')"></div>
-            <div class="color-opt" style="background: var(--hl-blue);" onclick="doHighlight('var(--hl-blue)')"></div>
-            <div class="color-opt" style="background: var(--hl-pink);" onclick="doHighlight('var(--hl-pink)')"></div>
-            <div class="btn-delete-all" onclick="clearAllHighlights()" title="Borrar todo">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <div class="color-dot" style="background:var(--hl-green);" onclick="applyHighlight('var(--hl-green)')">
+            </div>
+            <div class="color-dot" style="background:var(--hl-blue);" onclick="applyHighlight('var(--hl-blue)')"></div>
+            <div class="color-dot" style="background:var(--hl-pink);" onclick="applyHighlight('var(--hl-pink)')"></div>
+            <div class="color-dot" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center;"
+                onclick="clearAllHighlights()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="3">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
                 </svg>
             </div>
         </div>
-        <button class="btn-manual-save" onclick="manualSave()">💾 GUARDAR CAMBIOS</button>
-        <button class="btn-action"
-            style="background: #f1f5f9; color: #444; width: 100%; border: 1px solid #ddd; margin-top: 10px;"
-            onclick="hideSheets()">CANCELAR</button>
+        <button class="btn-sheet-opt" style="text-align:center; background:#f1f5f9;"
+            onclick="closeAllSheets()">CERRAR</button>
     </div>
 
     <div class="bottom-sheet" id="topics-sheet">
-        <h3>CONTENIDO DEL MÓDULO</h3>
-        <div style="display:flex; flex-direction:column; gap:12px; margin: 25px 0;">
-            <a href="#u1"
-                style="text-decoration:none; padding:18px; background:#f8fafc; border-radius:15px; color:var(--primary); font-weight:900; border: 1px solid #eee;"
-                onclick="hideSheets()">01. FUNDAMENTOS</a>
-            <a href="#u2"
-                style="text-decoration:none; padding:18px; background:#f8fafc; border-radius:15px; color:var(--primary); font-weight:900; border: 1px solid #eee;"
-                onclick="hideSheets()">02. PROCESO ADM</a>
+        <h3 class="sheet-title">ÍNDICE DE TEMAS</h3>
+        <div style="display: grid; gap: 10px;">
+            <button class="btn-sheet-opt" onclick="scrollToId('u1')">
+                01. Resoluciones Judiciales
+            </button>
+            <button class="btn-sheet-opt" onclick="scrollToId('u2')">
+                02. Recurso de Reposición
+            </button>
+            <button class="btn-sheet-opt" onclick="scrollToId('u3')">
+                03. Recurso de Reposición
+            </button>
+
+            <button class="btn-sheet-opt" onclick="scrollToId('u4')">
+                04. Recurso Diferido
+            </button>
+
+            <button class="btn-sheet-opt" onclick="scrollToId('u5')">
+                05. Recurso de Compulsa (Queja)
+            </button>
+
+            <button class="btn-sheet-opt" onclick="scrollToId('u6')">
+                06. Recurso de Casación
+            </button>
+
+            <button class="btn-sheet-opt" onclick="scrollToId('u7')">
+                07. Revisión extraordinaria de sentencia
+            </button>
         </div>
-        <button class="btn-action" style="width: 100%;" onclick="hideSheets()">CERRAR</button>
+        <button class="btn-sheet-opt" style="text-align:center; background:#f1f5f9; margin-top:15px;"
+            onclick="closeAllSheets()">CERRAR</button>
+    </div>
+
+    <!-- MODAL DE EVALUACIÓN KAHOOT -->
+    <div id="quiz-modal" class="quiz-overlay">
+        <button class="exit-quiz-btn" onclick="closeQuiz()">✕</button>
+        <div id="quiz-content"
+            style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center;"></div>
+    </div>
+
+    <!-- BARRA INFERIOR PILL -->
+    <div class="nav-pill-wrapper">
+        <nav class="nav-pill">
+            <button class="nav-item" onclick="scrollToId('top')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+                <span>INICIO</span>
+            </button>
+            <button class="nav-item center-btn" onclick="openHighlightMenu()">
+                <svg viewBox="0 0 24 24" fill="white">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                </svg>
+            </button>
+            <button class="nav-item" onclick="toggleSheet('topics-sheet')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+                <span>ÍNDICE</span>
+            </button>
+        </nav>
     </div>
 
     <footer>
-        <h2 style="margin-bottom:15px; letter-spacing:2px;">ACADEMIA PRO ADMINISTRACIÓN</h2>
-        <p>© 2026 Universidad Digital de Negocios</p>
+        <p style="font-weight: 900; color: white;">ACADEMIA PROCESAL BOLIVIA</p>
+        <p>© 2026 - FORMACIÓN ESPECIALIZADA</p>
     </footer>
 
     <script>
-        const STORAGE_KEY = 'admin1_study_marks';
+        // --- LÓGICA DE RESALTADO ---
+        let currentRange = null;
 
-        // --- LÓGICA DE ALMACENAMIENTO ---
-        function manualSave() {
-            const data = {
-                u1: document.getElementById('content-u1').innerHTML,
-                u2: document.getElementById('content-u2').innerHTML
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            showToast("💾 Cambios guardados en memoria");
-            hideSheets();
-        }
-
-        function loadFromLocal() {
-            /** * COMENTADO PARA QUE NO BORRE TUS EDICIONES DEL CÓDIGO HTML
-             * DESCOMENTA LAS LÍNEAS DE ABAJO CUANDO QUIERAS QUE SE CARGUE LO GUARDADO
-             **/
-            /*
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const data = JSON.parse(saved);
-                if (data.u1) document.getElementById('content-u1').innerHTML = data.u1;
-                if (data.u2) document.getElementById('content-u2').innerHTML = data.u2;
-                rebindHighlightClicks();
-            }
-            */
-        }
-
-        function rebindHighlightClicks() {
-            document.querySelectorAll('.user-highlight').forEach(span => {
-                span.onclick = function (e) {
-                    const parent = this.parentNode;
-                    while (this.firstChild) parent.insertBefore(this.firstChild, this);
-                    parent.removeChild(this);
-                    showToast("🗑️ Marca eliminada");
-                    // saveToLocal(); // Comentado para manual
-                    e.stopPropagation();
-                };
-            });
-        }
-
-        // --- LÓGICA DEL RESALTADOR ---
-        let lastCapturedRange = null;
-
-        function captureSelection() {
+        function handleSelection() {
             const sel = window.getSelection();
             if (sel.rangeCount > 0 && sel.toString().trim().length > 0) {
-                let range = sel.getRangeAt(0);
-                expandToWords(range);
-                lastCapturedRange = range.cloneRange();
+                currentRange = sel.getRangeAt(0).cloneRange();
+                toggleSheet('color-sheet');
             }
         }
 
-        function expandToWords(range) {
-            if (range.collapsed) return;
-            while (range.startOffset > 0 && !range.startContainer.textContent[range.startOffset - 1].match(/\s|[\.,;!¡?¿]/)) {
-                range.setStart(range.startContainer, range.startOffset - 1);
-            }
-            while (range.endOffset < range.endContainer.textContent.length && !range.endContainer.textContent[range.endOffset].match(/\s|[\.,;!¡?¿]/)) {
-                range.setEnd(range.endContainer, range.endOffset + 1);
+        function openHighlightMenu() {
+            const sel = window.getSelection();
+            if (sel.toString().trim().length > 0) {
+                currentRange = sel.getRangeAt(0).cloneRange();
+                toggleSheet('color-sheet');
+            } else {
+                showToast("⚠️ Selecciona un texto primero");
             }
         }
 
-        function triggerHighlightMenu() {
-            document.getElementById('overlay').classList.add('active');
-            document.getElementById('color-sheet').classList.add('active');
-        }
-
-        function doHighlight(color) {
-            if (!lastCapturedRange || lastCapturedRange.toString().trim().length === 0) {
-                showToast("⚠️ Selecciona una palabra primero", "animate__shakeX");
-                return;
-            }
-
+        function applyHighlight(color) {
+            if (!currentRange) return;
             const span = document.createElement('span');
             span.className = 'user-highlight';
             span.style.backgroundColor = color;
-
-            span.onclick = function (e) {
-                const parent = this.parentNode;
-                while (this.firstChild) parent.insertBefore(this.firstChild, this);
-                parent.removeChild(this);
-                showToast("🗑️ Marca eliminada");
-                e.stopPropagation();
-            };
-
+            span.onclick = (e) => removeHighlight(span, e);
             try {
-                const contents = lastCapturedRange.extractContents();
-                span.appendChild(contents);
-                lastCapturedRange.insertNode(span);
-                showToast("✅ Resaltado aplicado");
-                // manualSave(); // Puedes descomentar esto si quieres guardado auto al marcar
-            } catch (err) {
-                showToast("❌ No se puede marcar aquí");
-            }
+                span.appendChild(currentRange.extractContents());
+                currentRange.insertNode(span);
+                window.getSelection().removeAllRanges();
+                currentRange = null;
+                closeAllSheets();
+            } catch (e) { console.error(e); }
+        }
 
-            hideSheets();
-            window.getSelection().removeAllRanges();
-            lastCapturedRange = null;
+        function removeHighlight(el, event) {
+            if (event) event.stopPropagation();
+            const parent = el.parentNode;
+            while (el.firstChild) parent.insertBefore(el.firstChild, el);
+            el.remove();
         }
 
         function clearAllHighlights() {
-            const marks = document.querySelectorAll('.user-highlight');
-            marks.forEach(span => {
-                const parent = span.parentNode;
-                while (span.firstChild) parent.insertBefore(span.firstChild, span);
-                parent.removeChild(span);
-            });
-
-            localStorage.removeItem(STORAGE_KEY);
-            showToast("🧹 Memoria limpiada");
-            hideSheets();
+            document.querySelectorAll('.user-highlight').forEach(s => removeHighlight(s));
+            closeAllSheets();
         }
 
-        function showToast(msg, anim = "animate__fadeInDown") {
-            const t = document.getElementById('toast-msg');
-            t.innerText = msg;
-            t.style.display = 'block';
-            t.className = `toast animate__animated ${anim}`;
-            setTimeout(() => {
-                t.classList.replace(anim, "animate__fadeOutUp");
-                setTimeout(() => t.style.display = 'none', 500);
-            }, 3000);
+        // --- NAVEGACIÓN ---
+        function toggleSheet(id) {
+            closeAllSheets();
+            document.getElementById('main-overlay').classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
-        function openNavTopics() { document.getElementById('overlay').classList.add('active'); document.getElementById('topics-sheet').classList.add('active'); }
-        function hideSheets() {
-            document.getElementById('color-sheet').classList.remove('active');
-            document.getElementById('topics-sheet').classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
+        function closeAllSheets() {
+            document.querySelectorAll('.bottom-sheet, .overlay').forEach(el => el.classList.remove('active'));
         }
 
-        // --- INICIALIZACIÓN ---
-        window.onload = () => {
-            loadFromLocal();
-            games.forEach(g => new VFGame(g.id, g).start());
-        };
-
-        // --- JUEGOS ---
-        class Game {
-            constructor(cId, cfg) { this.container = document.getElementById(cId); this.cfg = cfg; this.user = ""; this.score = 0; this.i = 0; }
-            start() { this.renderStudy(() => this.renderForm(() => this.play())); }
-            renderStudy(next) {
-                this.container.innerHTML = `<div class="animate__animated animate__fadeIn"><h3>📚 REPASO: ${this.cfg.titulo}</h3><div class="study-grid">${this.cfg.estudio.map(c => `<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front">${c.termino}</div><div class="flashcard-back">${c.definicion}</div></div></div>`).join('')}</div><button class="btn-action" style="width:100%;">¡Al Examen!</button></div>`;
-                this.container.querySelector('button').onclick = next;
-            }
-            renderForm(next) {
-                this.container.innerHTML = `<div class="animate__animated animate__fadeIn"><h3>IDENTIDAD</h3><p style="margin:20px 0;">Nombre para calificar:</p><input type="text" class="input-name" placeholder="Tu nombre"><br><button class="btn-action" style="width:100%;">COMENZAR</button></div>`;
-                this.container.querySelector('button').onclick = () => { let v = this.container.querySelector('input').value; if (v.trim()) { this.user = v; next(); } };
-            }
-            renderFinal() {
-                this.container.innerHTML = `<div style="text-align:left; background:#f8fafc; padding:45px; border-radius:25px; border-left:12px solid var(--secondary);" class="animate__animated animate__jackInTheBox"><h3>REPORTE</h3><p>Estudiante: <strong>${this.user}</strong></p><div style="font-size:5rem; font-weight:900; color:var(--secondary);">${Math.round(this.score)}/100</div><button class="btn-action" style="margin-top:30px;" onclick="location.reload()">REINTENTAR</button></div>`;
-            }
-        }
-        class VFGame extends Game {
-            play() {
-                const p = this.cfg.preguntas[this.i];
-                this.container.innerHTML = `<div class="animate__animated animate__fadeIn"><p style="font-size:1.4rem; font-weight:700; margin-bottom:50px;">${p.texto}</p><div style="display:flex; gap:20px;"><button class="btn-action" style="background:var(--accent); flex:1;" id="v">V</button><button class="btn-action" style="background:var(--error); flex:1;" id="f">F</button></div></div>`;
-                this.container.querySelector('#v').onclick = () => this.check(true);
-                this.container.querySelector('#f').onclick = () => this.check(false);
-            }
-            check(r) {
-                let ok = r === this.cfg.preguntas[this.i].respuesta;
-                if (ok) { confetti({ particleCount: 150, colors: ['#10b981', '#ffffff'] }); this.score += (100 / this.cfg.preguntas.length); }
-                else { confetti({ particleCount: 100, colors: ['#ef4444', '#000000'] }); }
-                this.i++; if (this.i < this.cfg.preguntas.length) this.play(); else this.renderFinal();
+        function scrollToId(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+                closeAllSheets();
             }
         }
 
-        const games = [
-            {
-                id: "game-1",
-                titulo: "U1: Resoluciones Judiciales",
-
-                estudio: [
-                    { termino: "Resoluciones Judiciales", definicion: "Decisiones del juez dentro del proceso civil." },
-                    { termino: "Providencias", definicion: "Decisiones simples que impulsan el proceso." },
-                    { termino: "Autos", definicion: "Resuelven cuestiones importantes dentro del proceso." },
-                    { termino: "Sentencia", definicion: "Decisión final que resuelve el conflicto." },
-                    { termino: "Legalidad", definicion: "Las resoluciones deben basarse en la ley." },
-                    { termino: "Celeridad", definicion: "El proceso debe desarrollarse sin demoras." },
-                    { termino: "Igualdad Procesal", definicion: "Las partes deben ser tratadas de forma equitativa." },
-                    { termino: "Verdad Material", definicion: "El juez debe buscar la verdad de los hechos." },
-                    { termino: "Debido Proceso", definicion: "Garantía de un juicio justo y equitativo." },
-                    { termino: "Obligatoriedad", definicion: "Las resoluciones deben cumplirse obligatoriamente." }
-                ],
-
-                preguntas: [
-                    { texto: "¿Las resoluciones judiciales son decisiones del juez?", respuesta: true },
-                    { texto: "¿Las providencias resuelven el conflicto principal?", respuesta: false },
-                    { texto: "¿Las sentencias ponen fin al proceso?", respuesta: true },
-                    { texto: "¿Los autos son decisiones sin importancia dentro del proceso?", respuesta: false },
-                    { texto: "¿Las resoluciones deben basarse en la ley?", respuesta: true },
-                    { texto: "¿El principio de celeridad busca retrasar el proceso?", respuesta: false },
-                    { texto: "¿La igualdad procesal implica trato equitativo entre las partes?", respuesta: true },
-                    { texto: "¿El juez puede ignorar la verdad material?", respuesta: false },
-                    { texto: "¿Las resoluciones judiciales son opcionales?", respuesta: false },
-                    { texto: "¿El debido proceso garantiza un juicio justo?", respuesta: true },
-                    { texto: "¿Las providencias ayudan a avanzar el proceso?", respuesta: true },
-                    { texto: "¿Los autos pueden resolver incidentes?", respuesta: true },
-                    { texto: "¿La sentencia es la decisión más importante del proceso?", respuesta: true },
-                    { texto: "¿Las resoluciones no necesitan fundamentación?", respuesta: false },
-                    { texto: "¿El juez puede emitir resoluciones sin respetar la ley?", respuesta: false },
-                    { texto: "¿Las resoluciones deben ser claras y precisas?", respuesta: true },
-                    { texto: "¿El proceso civil no necesita orden ni dirección?", respuesta: false },
-                    { texto: "¿Las resoluciones permiten avanzar el proceso?", respuesta: true },
-                    { texto: "¿La verdad material significa ignorar pruebas?", respuesta: false },
-                    { texto: "¿Las resoluciones pueden ser ejecutadas con fuerza pública?", respuesta: true },
-                    { texto: "¿Las partes pueden ignorar las resoluciones judiciales?", respuesta: false },
-                    { texto: "¿El juez dirige el proceso mediante resoluciones?", respuesta: true },
-                    { texto: "¿Las sentencias solo sirven para ordenar trámites?", respuesta: false },
-                    { texto: "¿Las providencias son decisiones simples?", respuesta: true },
-                    { texto: "¿Los autos siempre terminan el proceso?", respuesta: false }
+        // --- KAHOOT QUIZ ---
+        const QUIZ_DATA = {
+            u1: {
+                title: "Resoluciones Judiciales",
+                questions: [
+                    {
+                        t: "¿Las resoluciones judiciales sirven para hacer avanzar el trámite o resolver el conflicto?",
+                        a: true
+                    },
+                    {
+                        t: "¿Es una característica de la resolución judicial ser emitida por una autoridad competente?",
+                        a: true
+                    },
+                    {
+                        t: "¿Qué implica que una resolución deba ser 'fundada y motivada'?",
+                        o: ["Que el juez debe pedir permiso", "Que el juez debe explicar el porqué de la decisión", "Que debe ser gratuita", "Que no puede ser impugnada"],
+                        a: "Que el juez debe explicar el porqué de la decisión"
+                    },
+                    {
+                        t: "¿Qué principio obliga al juez a responder puntualmente a lo solicitado?",
+                        o: ["Principio de Oralidad", "Principio de Publicidad", "Principio de Congruencia", "Principio de Celeridad"],
+                        a: "Principio de Congruencia"
+                    },
+                    {
+                        t: "¿Es obligatorio fundamentar las providencias de mero trámite según el Art. 209?",
+                        a: false
+                    },
+                    {
+                        t: "¿Qué resolución decide cuestiones que surgen DURANTE la tramitación del proceso?",
+                        o: ["Sentencia", "Auto Interlocutorio", "Auto Supremo", "Providencia"],
+                        a: "Auto Interlocutorio"
+                    },
+                    {
+                        t: "¿Qué resolución pone fin al proceso SIN resolver el fondo del conflicto?",
+                        o: ["Sentencia", "Auto Interlocutorio", "Auto Definitivo", "Auto de Vista"],
+                        a: "Auto Definitivo"
+                    },
+                    {
+                        t: "¿El Art. 213 define a la Sentencia como la resolución que pone fin al litigio resolviendo el fondo?",
+                        a: true
+                    },
+                    {
+                        t: "¿Qué resolución de segunda instancia revisa la sentencia del juez inferior?",
+                        o: ["Auto Interlocutorio", "Auto Supremo", "Providencia", "Auto de Vista"],
+                        a: "Auto de Vista"
+                    },
+                    {
+                        t: "¿Quién emite el Auto Supremo en última instancia según el Art. 219?",
+                        o: ["El Juez de Partido", "El Tribunal Supremo de Justicia", "El Consejo de la Magistratura", "El Tribunal Departamental"],
+                        a: "El Tribunal Supremo de Justicia"
+                    }
                 ]
             },
-            { id: "game-2", titulo: "U2: El Proceso", estudio: [{ termino: "Planeación", definicion: "Define metas." }, { termino: "Control", definicion: "Mide resultados." }], preguntas: [{ texto: "¿El control sirve para corregir errores?", respuesta: true }] }
-        ];
+            u2: {
+                title: "Recursos Judiciales",
+                questions: [
+
+                    { t: "¿Qué son los recursos judiciales?", o: ["Medios para crear leyes", "Medios para impugnar decisiones judiciales", "Órdenes del juez"], a: "Medios para impugnar decisiones judiciales" },
+
+                    { t: "¿Para qué sirven los recursos judiciales?", o: ["Para iniciar procesos nuevos", "Para corregir errores judiciales", "Para cerrar casos"], a: "Para corregir errores judiciales" },
+
+                    { t: "¿Quiénes pueden interponer recursos judiciales?", o: ["Cualquier persona", "Solo el juez", "Las partes del proceso"], a: "Las partes del proceso" },
+
+                    { t: "¿Qué requisito es necesario para interponer un recurso?", o: ["Ser abogado", "Existir un agravio", "Tener dinero"], a: "Existir un agravio" },
+
+                    { t: "¿Qué es el agravio?", o: ["Una sanción", "Un error del juez", "Un perjuicio causado por la resolución"], a: "Un perjuicio causado por la resolución" },
+
+                    { t: "¿El recurso debe interponerse dentro de un plazo legal?", a: true },
+
+                    { t: "¿El recurso de reposición busca que otro juez revise la decisión?", a: false },
+
+                    { t: "¿Qué busca el recurso de reposición?", o: ["Cambiar de juez", "Que el mismo juez corrija su decisión", "Suspender el proceso"], a: "Que el mismo juez corrija su decisión" },
+
+                    { t: "¿Qué es el recurso de apelación?", o: ["Revisión por un tribunal superior", "Corrección por el mismo juez", "Un castigo"], a: "Revisión por un tribunal superior" },
+
+                    { t: "¿El recurso de apelación se presenta ante el mismo juez?", a: false },
+
+                    { t: "¿Qué corrige el recurso de casación?", o: ["Errores de procedimiento", "Errores de derecho", "Errores administrativos"], a: "Errores de derecho" },
+
+                    { t: "¿Qué corrige el recurso de nulidad?", o: ["Errores de fondo", "Errores de forma o procedimiento", "Errores económicos"], a: "Errores de forma o procedimiento" },
+
+                    { t: "¿El recurso de compulsa se presenta cuando se concede correctamente un recurso?", a: false },
+
+                    { t: "¿Qué es el recurso de compulsa?", o: ["Revisión extraordinaria", "Recurso por negativa indebida de otro recurso", "Recurso de prueba"], a: "Recurso por negativa indebida de otro recurso" },
+
+                    { t: "¿La revisión extraordinaria se aplica en cualquier caso?", a: false },
+
+                    { t: "¿Qué es la revisión extraordinaria?", o: ["Revisión común", "Revisión de sentencias firmes en casos excepcionales", "Revisión administrativa"], a: "Revisión de sentencias firmes en casos excepcionales" }
+
+                ]
+            }
+        };
+
+        let session = { unit: "", step: 0, studentName: "", qIndex: 0, score: 0, timer: 20, timerInterval: null };
+
+        function openQuiz(unitId) {
+            session = { unit: unitId, step: 1, studentName: "", qIndex: 0, score: 0, timer: 20 };
+            document.body.classList.add('quiz-open');
+            document.getElementById('quiz-modal').classList.add('active');
+            renderQuiz();
+        }
+
+        function closeQuiz() {
+            clearInterval(session.timerInterval);
+            document.body.classList.remove('quiz-open');
+            document.getElementById('quiz-modal').classList.remove('active');
+            document.getElementById('quiz-content').innerHTML = "";
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-content');
+            const data = QUIZ_DATA[session.unit];
+
+            if (session.step === 1) {
+                container.innerHTML = `
+                    <div style="background:white; padding:40px; border-radius:15px; max-width:500px; margin:auto; text-align:center; color:#333;">
+                        <div style="background:#2563eb; color:white; padding:15px; margin-bottom:20px; font-weight:900; border-radius:8px;">EVALUACIÓN</div>
+                        <p style="margin-bottom:20px;">Ingresa tu nombre completo:</p>
+                        <input type="text" id="name-input" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:8px; margin-bottom:30px; font-size:1.2rem; text-align:center;">
+                        <button onclick="startTest()" style="width:100%; background:#46178f; color:white; padding:20px; border:none; border-radius:8px; font-weight:800; cursor:pointer;">EMPEZAR</button>
+                    </div>
+                `;
+            } else if (session.step === 2) {
+                const q = data.questions[session.qIndex];
+                const isBool = !q.o;
+                startTimer();
+
+                let answersHtml = "";
+                if (isBool) {
+                    answersHtml = `
+                        <div class="kahoot-answers-grid">
+                            <button class="kh-btn kh-blue" onclick="checkAns(true, this)"><div class="shape">▲</div> VERDADERO</button>
+                            <button class="kh-btn kh-red" onclick="checkAns(false, this)"><div class="shape">◆</div> FALSO</button>
+                        </div>
+                    `;
+                } else {
+                    const shapes = ["▲", "◆", "●", "■"];
+                    const colors = ["kh-red", "kh-blue", "kh-yellow", "kh-black"];
+                    answersHtml = `<div class="kahoot-answers-grid">${q.o.map((opt, i) => `<button class="kh-btn ${colors[i]}" onclick="checkAns('${opt}', this)"><div class="shape">${shapes[i]}</div> ${opt}</button>`).join('')}</div>`;
+                }
+
+                container.innerHTML = `
+                    <div class="timer-circle" id="quiz-timer">20</div>
+                    <div class="kahoot-question-box">${q.t}</div>
+                    <div style="flex-grow:1; display:flex; align-items:center;">${answersHtml}</div>
+                    <div style="text-align:center; padding:20px; font-weight:800; color:white; letter-spacing:2px;">PREGUNTA ${session.qIndex + 1} DE ${data.questions.length}</div>
+                `;
+            } else {
+                const pct = Math.round((session.score / data.questions.length) * 100);
+                if (pct >= 70) confetti({ particleCount: 200, spread: 90, zIndex: 3000000 });
+                container.innerHTML = `
+                    <div class="report-card animate__animated animate__zoomIn">
+                        <div style="font-weight:700; color:#94a3b8; font-size:0.8rem; letter-spacing:2px;">RECONOCIMIENTO ACADÉMICO</div>
+                        <div class="student-name-final">${session.studentName.toUpperCase()}</div>
+                        <p style="color:#64748b; font-size:0.9rem;">POR COMPLETAR EL MÓDULO:</p>
+                        <p style="color:var(--primary-blue); font-weight:900; margin-top:5px; text-transform:uppercase;">${data.title}</p>
+                        <div class="report-score">${pct}%</div>
+                        <button onclick="closeQuiz()" style="background:#1e293b; color:white; padding:15px 40px; border-radius:50px; border:none; cursor:pointer;">CERRAR</button>
+                    </div>
+                `;
+            }
+        }
+
+        function startTimer() {
+            clearInterval(session.timerInterval);
+            session.timer = 20;
+            session.timerInterval = setInterval(() => {
+                session.timer--;
+                const el = document.getElementById('quiz-timer');
+                if (el) el.innerText = session.timer;
+                if (session.timer <= 0) { clearInterval(session.timerInterval); checkAns(null, null); }
+            }, 1000);
+        }
+
+        function startTest() {
+            const name = document.getElementById('name-input').value;
+            if (name.length < 2) return showToast("Escribe tu nombre");
+            session.studentName = name; session.step = 2; renderQuiz();
+        }
+
+        function checkAns(ans, btn) {
+            clearInterval(session.timerInterval);
+            const q = QUIZ_DATA[session.unit].questions[session.qIndex];
+            const isCorrect = (ans === q.a);
+            const btns = document.querySelectorAll('.kh-btn');
+            btns.forEach(b => b.style.pointerEvents = 'none');
+            if (isCorrect) { if (btn) btn.classList.add('correct'); session.score++; confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 }, zIndex: 3000000 }); }
+            else {
+                if (btn) btn.classList.add('wrong'); btns.forEach(b => {
+                    let bText = b.innerText.toLowerCase();
+                    let val = bText.includes('verdadero') ? true : (bText.includes('falso') ? false : b.innerText.substring(2).trim());
+                    if (val === q.a) b.classList.add('correct');
+                });
+            }
+            setTimeout(() => { session.qIndex++; if (session.qIndex >= QUIZ_DATA[session.unit].questions.length) session.step = 3; renderQuiz(); }, 2000);
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.style.cssText = "position:fixed; top:30px; left:50%; transform:translateX(-50%); background:var(--primary-blue); color:white; padding:12px 30px; border-radius:100px; z-index:99999999; font-weight:800; box-shadow: 0 15px 30px rgba(0,0,0,0.2);";
+            t.className = "animate__animated animate__fadeInDown";
+            t.innerText = msg; document.body.appendChild(t);
+            setTimeout(() => { t.className = "animate__animated animate__fadeOutUp"; setTimeout(() => t.remove(), 500); }, 2500);
+        }
     </script>
 </body>
 
