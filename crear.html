@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Creador de Presentaciones Fácil</title>
+    <style>
+        /* --- ESTILOS MODERNOS Y LIMPIOS --- */
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F8FAFC;
+            --editor-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --danger: #EF4444;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Espacio garantizado para la barra inferior */
+            padding-bottom: 100px; 
+        }
+
+        /* --- MODO VISTA (Por Defecto) --- */
+        body.view-mode #toolbar { display: none; }
+        body.view-mode .editable:empty { display: none; }
+        
+        /* Barra de Herramientas Principal */
+        #toolbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px;
+            display: flex; gap: 8px; flex-wrap: wrap;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            align-items: center; justify-content: center;
+        }
+        .toolbar-group {
+            display: flex; gap: 6px; border-right: 2px solid var(--border-color);
+            padding-right: 12px; margin-right: 4px;
+        }
+        .toolbar-group:last-child { border-right: none; margin-left: auto; padding-right: 0; }
+
+        button.tool-btn {
+            background-color: white; color: var(--text-main);
+            border: 1px solid var(--border-color); width: 44px; height: 44px;
+            border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; padding: 0;
+        }
+        button.tool-btn:hover { background-color: var(--bg-color); border-color: #CBD5E1; transform: translateY(-2px); }
+        button.tool-btn:active { transform: translateY(0); }
+        button.tool-btn.primary { background-color: var(--primary); color: white; border-color: var(--primary); }
+        button.tool-btn.primary:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); }
+        
+        .tool-btn svg { width: 22px; height: 22px; }
+
+        /* Área de Edición */
+        #editor {
+            width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 5%;
+            background: transparent; min-height: 60vh;
+        }
+
+        /* Contenedor de Bloques */
+        .block-container {
+            position: relative; margin-bottom: 20px; padding: 10px;
+            border-radius: 12px; border: 2px solid transparent; transition: all 0.3s ease;
+        }
+
+        /* Bloque Activo */
+        body.edit-mode .block-container.active-block {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+            background-color: #FFFFFF;
+        }
+
+        /* Drag & Drop */
+        .drag-handle {
+            position: absolute; left: -30px; top: 50%; transform: translateY(-50%); cursor: grab; color: #94A3B8;
+            display: none; padding: 5px; user-select: none; z-index: 10;
+        }
+        .drag-handle:active { cursor: grabbing; }
+        body.edit-mode .block-container:hover .drag-handle { display: block; }
+        .block-container.dragging { opacity: 0.4; background: #F1F5F9; }
+        body.edit-mode .block-container:hover { border-color: var(--border-color); background-color: #FFFFFF; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        body.edit-mode .block-container.active-block:hover { border-color: var(--primary); }
+
+        /* Acciones de bloque */
+        .block-actions {
+            position: absolute; top: -16px; right: -8px;
+            display: none; gap: 6px; z-index: 10;
+        }
+        body.edit-mode .block-container:hover .block-actions, body.edit-mode .block-container.active-block .block-actions { display: flex; }
+        .action-btn {
+            color: white; border: none; border-radius: 50%; width: 32px; height: 32px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; padding: 0;
+        }
+        .action-btn svg { width: 16px; height: 16px; }
+        .action-btn:hover { transform: scale(1.15); }
+        .btn-delete { background: var(--danger); }
+        .btn-edit { background: var(--primary); }
+        .btn-move { background: #475569; }
+
+        /* Tipografía Editable */
+        .editable { outline: none; margin: 0; line-height: 1.3; min-height: 1em; overflow-wrap: break-word; word-break: break-word; transition: background 0.3s ease; }
+        h1.editable { font-size: 4em; margin-bottom: 0.3em; font-weight: 800; letter-spacing: -0.02em; color: #0F172A; }
+        h2.editable { font-size: 3.2em; margin-bottom: 0.3em; font-weight: 700; color: #1E293B; }
+        h3.editable { font-size: 2.6em; margin-bottom: 0.3em; font-weight: 600; color: #334155; }
+        h4.editable { font-size: 2.2em; margin-bottom: 0.3em; font-weight: 600; color: #475569; }
+        p.editable { font-size: 1.8em; color: #475569; line-height: 1.6; }
+        body.edit-mode .editable:empty::before { content: attr(data-placeholder); color: #CBD5E1; pointer-events: none; display: block; }
+        body.edit-mode .editable:focus { background: rgba(241, 245, 249, 0.5); border-radius: 8px; padding: 5px; margin: -5px; }
+
+        /* Imágenes y Videos */
+        .img-element { width: 100%; max-width: 100%; border-radius: 16px; display: block; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .video-wrapper { width: 100%; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .yt-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
+        .yt-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .tk-wrapper { max-width: 400px; height: 700px; margin: 0 auto; }
+        .tk-wrapper iframe { width: 100%; height: 100%; border: 0; }
+
+        .url-input-box {
+            background: #F1F5F9; padding: 20px; border-radius: 12px; text-align: center; border: 2px dashed #CBD5E1;
+            display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box;
+        }
+        .url-input-box p { width: 100%; margin: 0; color: #475569; font-size: 16px; font-weight: bold; }
+        .url-input-row { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; max-width: 500px; margin: 0 auto; }
+        .url-input-box input { flex: 1 1 200px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; outline:none; min-width: 0; box-sizing: border-box; width: 100%; }
+        .url-input-box input:focus { border-color: var(--primary); }
+        .btn-apply { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; flex-shrink: 0; box-sizing: border-box; }
+
+        /* Layout Mixto */
+        .wrap-container { display: block; }
+        .wrap-container::after { content: ""; clear: both; display: table; }
+        .wrap-container .img-element, .wrap-container .url-input-box { float: right; width: 45%; max-width: 400px; margin: 0 0 20px 30px; clear: right; }
+        .wrap-container p { min-height: 100px; }
+
+        /* Bloque de Código */
+        .code-wrapper { position: relative; background: #1E293B; border-radius: 12px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .code-wrapper pre { 
+            margin: 0; padding: 50px 20px 20px 20px; color: #F8FAFC; 
+            font-family: 'Courier New', monospace; font-size: 18px; 
+            overflow-x: auto; white-space: pre; word-break: normal; overflow-wrap: normal; outline: none; 
+        }
+        body.edit-mode .code-wrapper pre:empty::before { content: "Pega tu código aquí..."; color: #64748B; }
+        .btn-copy-code {
+            position: absolute; top: 10px; right: 10px; background: #334155; color: white;
+            border: 1px solid #475569; padding: 6px 12px; border-radius: 6px; font-size: 14px; cursor: pointer; z-index: 5; display: flex; align-items: center; gap: 6px; transition: background 0.2s;
+        }
+        .btn-copy-code:hover { background: #475569; }
+
+        /* Botón Enlace Personalizado */
+        .link-edit-container { display: flex; flex-direction: column; gap: 10px; background: #F1F5F9; padding: 20px; border-radius: 12px; border: 2px dashed #CBD5E1; max-width: 600px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .link-edit-row { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; box-sizing: border-box; }
+        .link-edit-input { flex: 1 1 200px; padding: 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 16px; outline:none; min-width: 0; box-sizing: border-box; width: 100%; }
+        .link-edit-input:focus { border-color: var(--primary); }
+
+        /* --- ESTILOS DE TAREAS / QUIZ (Edición) --- */
+        .quiz-edit-container { background: #F8FAFC; padding: 20px; border-radius: 16px; border: 2px dashed #CBD5E1; width: 100%; box-sizing: border-box; }
+        .quiz-title-input { width: 100%; padding: 15px; font-size: 1.5em; border: 2px solid #E2E8F0; border-radius: 10px; margin-bottom: 20px; font-weight: bold; text-align: center; color: #0F172A; outline:none; box-sizing: border-box; }
+        .quiz-title-input:focus { border-color: var(--primary); }
+        .quiz-edit-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #E2E8F0; width: 100%; box-sizing: border-box; }
+        .quiz-q-header-edit { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; color: #475569; font-size: 16px; }
+        .quiz-q-text-input { width: 100%; padding: 12px; font-size: 1.2em; border: 2px solid #E2E8F0; border-radius: 8px; margin-bottom: 15px; font-weight: bold; outline:none; box-sizing: border-box; }
+        .quiz-q-text-input:focus { border-color: var(--primary); }
+        .quiz-edit-option { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; background: #F8FAFC; padding: 8px 12px; border-radius: 8px; border: 1px solid #E2E8F0; width: 100%; box-sizing: border-box; }
+        .quiz-edit-option input[type="radio"] { transform: scale(1.5); cursor: pointer; margin: 0; width: 20px; height: 20px; accent-color: var(--primary); flex-shrink: 0; }
+        .quiz-edit-option input[type="text"] { flex: 1; padding: 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 15px; outline:none; min-width: 0; box-sizing: border-box; }
+        .quiz-edit-option input[type="text"]:focus { border-color: var(--primary); }
+        .btn-text { background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; box-sizing: border-box; }
+        .btn-text:hover { background: #E2E8F0; }
+
+        /* --- ESTILOS DE TAREAS / QUIZ (Vista Kahoot) --- */
+        .quiz-app-container { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); padding: 60px 40px; border-radius: 24px; border: 1px solid #E2E8F0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); margin: 40px 0; }
+        .quiz-name-input { width: 100%; max-width: 600px; padding: 25px; font-size: 28px; border: 3px solid #CBD5E1; border-radius: 12px; margin-bottom: 30px; text-align: center; font-weight: bold; outline: none; transition: border-color 0.3s; }
+        .quiz-name-input:focus { border-color: var(--primary); }
+        .quiz-start, .quiz-results { text-align: center; }
+        .quiz-q-header { font-size: 20px; color: #64748b; font-weight: 800; margin-bottom: 15px; letter-spacing: 2px; }
+        .quiz-question { font-size: 3.5em; margin-bottom: 40px; font-weight: 900; color: #0f172a; overflow-wrap: break-word; word-break: break-word; line-height: 1.2; }
+        .kahoot-grid { display: grid; gap: 24px; }
+        .k-btn { padding: 40px 20px; font-size: 2.5em; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: bold; box-shadow: 0 8px 0 rgba(0,0,0,0.2); transition: transform 0.1s, box-shadow 0.1s, filter 0.2s; display: flex; align-items: center; justify-content: center; overflow-wrap: break-word; word-break: break-word; line-height: 1.3;}
+        .k-btn:active:not(:disabled) { transform: translateY(8px); box-shadow: none; }
+        .k-red { background-color: #E21B3C; } .k-blue { background-color: #1368CE; } .k-yellow { background-color: #D89E00; } .k-green { background-color: #26890C; }
+        .quiz-feedback { text-align: center; font-size: 3em; font-weight: 900; margin-top: 30px; min-height: 1.5em; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .correct-feedback { color: #26890C; } .incorrect-feedback { color: #E21B3C; }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* --- MENÚ LATERAL (ÍNDICE) --- */
+        .toc-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 10004; display: none; backdrop-filter: blur(4px); }
+        .toc-overlay.open { display: block; }
+        .toc-menu { 
+            position: fixed; top: 0; left: -100%; width: 350px; max-width: 85%; height: 100%; height: 100dvh; 
+            background: white; z-index: 10005; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            overflow-y: auto; padding: 30px 30px 90px 30px; box-shadow: 10px 0 25px rgba(0,0,0,0.15); 
+        }
+        .toc-menu.open { left: 0; }
+        .toc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
+        .toc-header h3 { margin: 0; font-size: 24px; color: #0F172A; font-weight: 800; }
+        .toc-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #64748B; padding: 0; transition: color 0.2s; }
+        .toc-close:hover { color: #0F172A; }
+        .toc-item { list-style: none; margin-bottom: 10px; }
+        .toc-item a { text-decoration: none; color: #334155; display: block; padding: 10px 12px; border-radius: 8px; transition: background 0.2s, color 0.2s; line-height: 1.4; white-space: normal; word-wrap: break-word; font-size: 16px; }
+        .toc-item a:hover { background: #EEF2FF; color: var(--primary); font-weight: bold; }
+        .toc-h1 { font-weight: 800; font-size: 18px; margin-top: 25px; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px; color: #0F172A; }
+        .toc-h1 a { font-size: 18px; color: #0F172A; }
+        .toc-h2 { margin-left: 15px; font-weight: 700; color: #1E293B; }
+        .toc-h3 { margin-left: 30px; color: #475569; }
+
+        /* --- BARRA INFERIOR UNIFICADA (PC Y MÓVIL) --- */
+        .mobile-bottom-bar {
+            display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
+            background: rgba(255, 255, 255, 0.95); border-top: 1px solid #E2E8F0;
+            justify-content: center; gap: 50px; align-items: center; z-index: 99999;
+            padding-bottom: env(safe-area-inset-bottom);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+        .bottom-bar-btn {
+            background: none; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #64748B; font-size: 14px; font-weight: 800; cursor: pointer; width: 100px; gap: 8px; text-decoration: none; padding: 0; height: 100%; transition: all 0.2s;
+        }
+        .bottom-bar-btn svg { width: 28px; height: 28px; stroke: currentColor; transition: transform 0.2s; }
+        .bottom-bar-btn:hover { color: var(--primary); background-color: #F3F4F6; border-radius: 8px; }
+        .bottom-bar-btn.active { color: var(--danger); }
+        
+        #save-indicator {
+            position: fixed; top: 20px; right: 20px; background: #10B981; color: white;
+            padding: 10px 20px; border-radius: 50px; font-size: 14px; font-weight: bold; opacity: 0;
+            transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 100000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(-20px);
+        }
+        #save-indicator.show { opacity: 1; transform: translateY(0); }
+
+        /* Modal Flotante de Contraseña */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7); display: none; justify-content: center; align-items: center;
+            z-index: 100000; backdrop-filter: blur(6px);
+        }
+        .modal-content { background: white; padding: 35px; border-radius: 16px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .modal-content h3 { margin-top: 0; color: #0F172A; font-size: 1.8em; margin-bottom: 20px; }
+        .modal-content input { width: 100%; padding: 15px; border: 2px solid #CBD5E1; border-radius: 10px; font-size: 18px; margin-bottom: 20px; text-align: center; outline: none; transition: border-color 0.2s; }
+        .modal-content input:focus { border-color: var(--primary); }
+        .modal-buttons { display: flex; gap: 12px; }
+        .modal-buttons button { flex: 1; padding: 12px; font-size: 16px; border-radius: 10px; }
+
+        /* --- PUNTERO LÁSER (PUNTO ROJO REALISTA) --- */
+        #laser-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99998; display: none; }
+        body.laser-on { cursor: none !important; }
+        body.laser-on * { cursor: none !important; }
+        #laser-canvas.active { display: block; }
+
+        /* --- OPTIMIZACIÓN EXTREMA MÓVIL --- */
+        @media (max-width: 600px) {
+            body { padding-bottom: 90px !important; } /* Aumentado para la barra de móvil */
+            #editor { padding: 15px; margin: 0; border-radius: 0; min-height: auto; }
+            
+            /* TAMAÑOS DE TEXTO NORMALES PARA CELULAR */
+            h1.editable { font-size: 2.2em; }
+            h2.editable { font-size: 1.8em; }
+            h3.editable { font-size: 1.5em; }
+            h4.editable { font-size: 1.3em; }
+            p.editable { font-size: 1.1em; }
+            
+            body.edit-mode .block-container { margin-top: 25px; padding: 8px; border-color: #E2E8F0; }
+            body.edit-mode .block-actions { display: flex; top: -18px; right: -5px; gap: 6px; }
+            body.edit-mode .drag-handle { display: none; }
+            
+            .wrap-container .img-element, .wrap-container .url-input-box { float: none; width: 100%; max-width: 100%; margin: 0 0 15px 0; }
+            
+            /* Evitar que inputs en móvil rompan las cajas */
+            .link-edit-row { flex-direction: column; gap: 8px; }
+            .url-input-row { flex-direction: column; gap: 8px; }
+            .btn-apply { width: 100%; padding: 12px; }
+
+            #toolbar { padding: 10px 5px; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; }
+            .toolbar-group { padding-right: 8px; margin-right: 4px; flex-shrink: 0; gap: 4px; }
+            button.tool-btn { width: 38px; height: 38px; }
+            
+            /* Tareas Kahoot en Celular */
+            .quiz-app-container { padding: 25px 15px; margin: 15px 0; border-radius: 16px; }
+            .quiz-name-input { font-size: 18px; padding: 15px; }
+            .quiz-question { font-size: 1.6em; margin-bottom: 25px; }
+            .kahoot-grid { grid-template-columns: 1fr !important; gap: 12px; }
+            .k-btn { font-size: 1.3em; padding: 20px 15px; border-radius: 12px; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+            .k-btn:active:not(:disabled) { transform: translateY(4px); }
+            .quiz-feedback { font-size: 1.8em; margin-top: 15px; }
+            .quiz-results h1 { font-size: 48px !important; }
+            
+            #save-indicator { top: 10px; right: 10px; padding: 6px 14px; font-size: 12px; }
+
+            /* Barra Inferior en Móvil */
+            .mobile-bottom-bar { justify-content: space-around; gap: 0; height: 65px; }
+            .bottom-bar-btn { width: 100%; font-size: 12px; gap: 4px; }
+            .bottom-bar-btn svg { width: 24px; height: 24px; }
+
+            /* Menú Lateral (Ajuste para que no ocupe 100% de ancho en celular) */
+            .toc-menu { padding: 25px 20px 90px 20px; }
+        }
+
+        /* --- AJUSTES CELULARES MUY PEQUEÑOS --- */
+        @media (max-width: 350px) {
+            #editor { padding: 12px 8px; }
+            h1.editable { font-size: 1.8em; }
+            h2.editable { font-size: 1.5em; }
+            p.editable { font-size: 1em; }
+            .quiz-question { font-size: 1.4em; }
+            .k-btn { font-size: 1.1em; padding: 15px 10px; }
+            .quiz-results h1 { font-size: 36px !important; }
+            .mobile-bottom-bar { height: 60px; }
+            .bottom-bar-btn svg { width: 22px; height: 22px; }
+            .bottom-bar-btn { font-size: 10px; }
+        }
+    </style>
+</head>
+<body class="view-mode">
+
+    <!-- Menú Lateral (Índice / Table of Contents) -->
+    <div id="toc-overlay" class="toc-overlay" onclick="toggleMenu()"></div>
+    <div id="toc-menu" class="toc-menu">
+        <div class="toc-header">
+            <h3>📑 Índice de Clases</h3>
+            <button class="toc-close" onclick="toggleMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <ul id="toc-list" style="padding:0; margin:0;"></ul>
+    </div>
+
+    <!-- Barra Inferior (Visible en PC y Móviles) -->
+    <div id="mobile-bottom-bar" class="mobile-bottom-bar">
+        <button class="bottom-bar-btn" onclick="toggleMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+            <span>Menú</span>
+        </button>
+        <a href="index.html" class="bottom-bar-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Inicio</span>
+        </a>
+        <button class="bottom-bar-btn" onclick="toggleLaser()" id="btn-laser-mobile">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+            <span id="text-laser-mobile">Láser</span>
+        </button>
+        <button class="bottom-bar-btn" onclick="toggleAppMode()" id="btn-mode-mobile">
+            <svg id="icon-mode-mobile" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+            <span id="text-mode-mobile">Editar</span>
+        </button>
+    </div>
+
+    <!-- Barra de Herramientas Principal (Edición) -->
+    <div id="toolbar">
+        <div class="toolbar-group">
+            <button class="tool-btn" onclick="addBlock('h1')" title="Materia (H1)"><b style="font-size:18px;">H1</b></button>
+            <button class="tool-btn" onclick="addBlock('h2')" title="Unidad Temática (H2)"><b style="font-size:16px;">H2</b></button>
+            <button class="tool-btn" onclick="addBlock('h3')" title="Subtítulo (H3)"><b style="font-size:14px;">H3</b></button>
+            <button class="tool-btn" onclick="addBlock('h4')" title="Título Pequeño (H4)"><b style="font-size:12px;">H4</b></button>
+        </div>
+        <div class="toolbar-group">
+            <button class="tool-btn" onclick="addBlock('p')" title="Párrafo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+            </button>
+            <button class="tool-btn" onclick="addBlock('img')" title="Imagen">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </button>
+            <button class="tool-btn" onclick="addBlock('video')" title="Video (YouTube/TikTok)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </button>
+            <button class="tool-btn" onclick="addBlock('p-img')" title="Texto + Imagen">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            </button>
+            <button class="tool-btn" onclick="addBlock('link')" title="Botón / Enlace">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </button>
+            <button class="tool-btn" onclick="addBlock('code')" title="Bloque de Código">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </button>
+            <button class="tool-btn" onclick="addBlock('quiz')" title="Crear Tarea Interactiva">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </button>
+        </div>
+        <div class="toolbar-group">
+            <button class="tool-btn primary" onclick="downloadHTML()" title="Descargar index.html">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Área de Edición -->
+    <div id="editor"></div>
+    <div id="save-indicator">Guardado</div>
+    
+    <!-- Canvas del Puntero Láser -->
+    <canvas id="laser-canvas"></canvas>
+
+    <!-- Modal Contraseña -->
+    <div id="password-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-bottom:15px;">Acceso Profesor</h3>
+            <input type="password" id="prof-password" placeholder="Contraseña secreta">
+            <div class="modal-buttons">
+                <button class="btn-text" onclick="closePasswordModal()">Cancelar</button>
+                <button class="btn-text" style="background:var(--primary); color:white; border:none;" onclick="checkPassword()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ICONOS SVG REUTILIZABLES ---
+        const SVG = {
+            edit: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>',
+            view: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+            del: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
+            up: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
+            down: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+            check: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+            grip: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>',
+            refresh: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
+            plus: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+            copy: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+            home: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+        };
+
+        let blocks = [];
+        let draggedBlockId = null; 
+        let activeBlockId = null; 
+        const editor = document.getElementById('editor');
+        const saveIndicator = document.getElementById('save-indicator');
+        let saveTimeout;
+
+        window.onload = () => {
+            const savedData = localStorage.getItem('presentacionFacil');
+            if (savedData) blocks = JSON.parse(savedData);
+            if (blocks.length === 0) blocks.push({ id: Date.now(), type: 'h1', content: '' });
+            blocks.forEach(b => {
+                if (b.type === 'quiz' && !b.questions) {
+                    b.quizTitle = 'Tarea de Clase';
+                    b.questions = [{ q: b.question || '', options: b.options || ['','','',''], correctIndex: b.correctIndex || 0 }];
+                }
+            });
+            renderEditor();
+            document.getElementById('prof-password').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') checkPassword();
+            });
+        };
+
+        // --- LÓGICA DEL MENÚ LATERAL (ÍNDICE) ---
+        function toggleMenu() {
+            const menu = document.getElementById('toc-menu');
+            const overlay = document.getElementById('toc-overlay');
+            if (menu.classList.contains('open')) {
+                menu.classList.remove('open');
+                overlay.classList.remove('open');
+            } else {
+                menu.classList.add('open');
+                overlay.classList.add('open');
+            }
+        }
+
+        function generateMenu() {
+            const tocList = document.getElementById('toc-list');
+            if (!tocList) return;
+            tocList.innerHTML = '';
+            let hasItems = false;
+            
+            blocks.forEach(b => {
+                if (['h1', 'h2', 'h3'].includes(b.type) && b.content.trim() !== '') {
+                    hasItems = true;
+                    const li = document.createElement('li');
+                    li.className = 'toc-item toc-' + b.type;
+                    const tempDiv = document.createElement('div'); tempDiv.innerHTML = b.content;
+                    const text = tempDiv.textContent || tempDiv.innerText || 'Sin título';
+                    li.innerHTML = `<a href="#block-${b.id}" onclick="toggleMenu()">${text}</a>`;
+                    tocList.appendChild(li);
+                }
+            });
+            
+            if (!hasItems) tocList.innerHTML = '<p style="color:#94A3B8; text-align:center; margin-top:30px; font-size:16px;">No hay unidades registradas.</p>';
+        }
+
+        // --- MODO VISTA / EDICIÓN ---
+        function toggleAppMode() {
+            const isViewMode = document.body.classList.contains('view-mode');
+            if (isViewMode) {
+                document.getElementById('password-modal').style.display = 'flex';
+                document.getElementById('prof-password').value = '';
+                setTimeout(() => document.getElementById('prof-password').focus(), 100);
+            } else {
+                document.body.classList.replace('edit-mode', 'view-mode');
+                
+                const mobIcon = document.getElementById('icon-mode-mobile');
+                const mobText = document.getElementById('text-mode-mobile');
+                if(mobIcon) mobIcon.innerHTML = SVG.edit;
+                if(mobText) mobText.innerText = "Editar";
+
+                showSaveIndicator("Modo Vista");
+                renderEditor();
+            }
+        }
+
+        function closePasswordModal() { document.getElementById('password-modal').style.display = 'none'; }
+
+        function checkPassword() {
+            if (document.getElementById('prof-password').value === "dario") {
+                closePasswordModal();
+                document.body.classList.replace('view-mode', 'edit-mode');
+                
+                const mobIcon = document.getElementById('icon-mode-mobile');
+                const mobText = document.getElementById('text-mode-mobile');
+                if(mobIcon) mobIcon.innerHTML = SVG.view;
+                if(mobText) mobText.innerText = "Vista";
+
+                showSaveIndicator("Modo Edición");
+                renderEditor();
+            } else {
+                alert("Contraseña incorrecta.");
+                document.getElementById('prof-password').value = '';
+                document.getElementById('prof-password').focus();
+            }
+        }
+
+        // --- PUNTERO LÁSER ---
+        let laserActive = false; 
+        let mouseX = -100, mouseY = -100;
+        
+        function toggleLaser() {
+            laserActive = !laserActive; 
+            const canvas = document.getElementById('laser-canvas');
+            const mobBtn = document.getElementById('btn-laser-mobile');
+            
+            if (laserActive) { 
+                canvas.classList.add('active'); 
+                document.body.classList.add('laser-on');
+                if(mobBtn) { mobBtn.classList.add('active'); document.getElementById('text-laser-mobile').innerText = 'Apagar'; }
+            } else { 
+                canvas.classList.remove('active'); 
+                document.body.classList.remove('laser-on');
+                if(mobBtn) { mobBtn.classList.remove('active'); document.getElementById('text-laser-mobile').innerText = 'Láser'; }
+                const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            }
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && laserActive) toggleLaser(); });
+        
+        const canvas = document.getElementById('laser-canvas'); const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        
+        window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        window.addEventListener('touchstart', (e) => { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; }, {passive: true});
+        window.addEventListener('touchmove', (e) => { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; }, {passive: true});
+        
+        function drawLaser() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (laserActive) {
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 8, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.9)'; 
+                ctx.shadowColor = 'rgba(239, 68, 68, 1)';
+                ctx.shadowBlur = 15; 
+                ctx.fill();
+                ctx.shadowBlur = 0; 
+            }
+            requestAnimationFrame(drawLaser);
+        }
+        drawLaser();
+
+        // --- CRUD DE BLOQUES ---
+        function showSaveIndicator(text = "Guardado") {
+            saveIndicator.innerHTML = text;
+            saveIndicator.classList.add('show');
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => { saveIndicator.classList.remove('show'); }, 2000);
+        }
+
+        function autoSave() { 
+            localStorage.setItem('presentacionFacil', JSON.stringify(blocks)); 
+            showSaveIndicator(); 
+            generateMenu(); 
+        }
+
+        function addBlock(type) {
+            if (type === 'h1' && blocks.some(b => b.type === 'h1')) return alert("Solo un H1 (Nombre de materia) por presentación.");
+            const newBlock = { id: Date.now(), type: type, content: '', url: '' };
+            if (type === 'p-img') newBlock.content = ''; 
+            if (type === 'link') { newBlock.content = 'Enlace'; newBlock.url = 'https://'; }
+            if (type === 'quiz') { newBlock.quizTitle = 'Título de la Tarea'; newBlock.questions = [ { q: '', options: ['', '', '', ''], correctIndex: 0 } ]; }
+            
+            if (activeBlockId) {
+                const index = blocks.findIndex(b => b.id === activeBlockId);
+                if (index !== -1) {
+                    blocks.splice(index + 1, 0, newBlock);
+                } else {
+                    blocks.push(newBlock);
+                }
+            } else {
+                blocks.push(newBlock);
+            }
+            
+            activeBlockId = newBlock.id;
+            autoSave(); 
+            renderEditor(); 
+            
+            setTimeout(() => {
+                const newEl = document.getElementById(`block-${newBlock.id}`);
+                if (newEl) newEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function deleteBlock(id) { 
+            blocks = blocks.filter(b => b.id !== id); 
+            if (activeBlockId === id) activeBlockId = null;
+            autoSave(); 
+            renderEditor(); 
+        }
+        function moveBlock(id, direction) {
+            const index = blocks.findIndex(b => b.id === id);
+            if (index < 0 || index + direction < 0 || index + direction >= blocks.length) return;
+            const temp = blocks[index]; blocks[index] = blocks[index + direction]; blocks[index + direction] = temp;
+            activeBlockId = id; 
+            autoSave(); renderEditor();
+        }
+        function updateText(id, newText) { const block = blocks.find(b => b.id === id); if (block) { block.content = newText; autoSave(); } }
+        function setImageURL(id, urlInputId) { const url = document.getElementById(urlInputId).value; if (url.trim() !== '') { const block = blocks.find(b => b.id === id); if (block) { block.url = url; autoSave(); renderEditor(); } } }
+
+        function getVideoEmbedHTML(url) {
+            const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+            if (ytMatch && ytMatch[1]) return `<div class="video-wrapper yt-wrapper"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" allowfullscreen></iframe></div>`;
+            const tkMatch = url.match(/tiktok\.com\/.*video\/(\d+)/);
+            if (tkMatch && tkMatch[1]) return `<div class="video-wrapper tk-wrapper"><iframe src="https://www.tiktok.com/embed/v2/${tkMatch[1]}" allowfullscreen></iframe></div>`;
+            return `<div style="padding:15px; text-align:center; color:red; border:1px dashed red; border-radius:6px; font-size:12px;">Enlace no soportado</div>`;
+        }
+
+        function renderEditor() {
+            editor.innerHTML = ''; 
+            const isEditable = document.body.classList.contains('edit-mode');
+            const btnT1 = document.getElementById('btn-t1'); if (btnT1) btnT1.disabled = blocks.some(b => b.type === 'h1');
+
+            blocks.forEach(block => {
+                const container = document.createElement('div'); container.className = 'block-container';
+                container.id = `block-${block.id}`;
+                
+                if (isEditable && activeBlockId === block.id) {
+                    container.classList.add('active-block');
+                }
+
+                if (isEditable) {
+                    container.addEventListener('mousedown', (e) => {
+                        if (!e.target.closest('.action-btn') && !e.target.closest('button')) {
+                            activeBlockId = block.id;
+                            document.querySelectorAll('.block-container').forEach(c => c.classList.remove('active-block'));
+                            container.classList.add('active-block');
+                        }
+                    });
+
+                    const dragHandle = document.createElement('div'); dragHandle.className = 'drag-handle'; dragHandle.innerHTML = SVG.grip;
+                    dragHandle.onmousedown = () => container.setAttribute('draggable', 'true');
+                    dragHandle.onmouseup = () => container.setAttribute('draggable', 'false');
+                    dragHandle.onmouseleave = () => container.setAttribute('draggable', 'false');
+                    container.addEventListener('dragstart', () => { draggedBlockId = block.id; setTimeout(() => container.classList.add('dragging'), 0); });
+                    container.addEventListener('dragend', () => { draggedBlockId = null; container.classList.remove('dragging'); container.setAttribute('draggable', 'false'); renderEditor(); });
+                    container.addEventListener('dragover', (e) => { e.preventDefault(); const draggingEl = document.querySelector('.dragging'); if(draggingEl && draggingEl !== container) container.style.borderTop = "2px dashed var(--primary)"; });
+                    container.addEventListener('dragleave', () => container.style.borderTop = "2px solid transparent");
+                    container.addEventListener('drop', (e) => {
+                        e.preventDefault(); container.style.borderTop = "2px solid transparent";
+                        if (draggedBlockId && draggedBlockId !== block.id) {
+                            const [item] = blocks.splice(blocks.findIndex(b => b.id === draggedBlockId), 1);
+                            blocks.splice(blocks.findIndex(b => b.id === block.id), 0, item);
+                            autoSave(); renderEditor();
+                        }
+                    });
+                    container.appendChild(dragHandle);
+
+                    const actionsDiv = document.createElement('div'); actionsDiv.className = 'block-actions';
+                    
+                    const btnUp = document.createElement('button'); btnUp.className = 'action-btn btn-move'; btnUp.innerHTML = SVG.up; btnUp.title = "Subir"; btnUp.onclick = () => moveBlock(block.id, -1); actionsDiv.appendChild(btnUp);
+                    const btnDown = document.createElement('button'); btnDown.className = 'action-btn btn-move'; btnDown.innerHTML = SVG.down; btnDown.title = "Bajar"; btnDown.onclick = () => moveBlock(block.id, 1); actionsDiv.appendChild(btnDown);
+                    
+                    if (['img', 'video', 'p-img'].includes(block.type) && block.url) {
+                        const btnEdit = document.createElement('button'); btnEdit.className = 'action-btn btn-edit'; btnEdit.innerHTML = SVG.edit; btnEdit.title = "Editar URL"; btnEdit.onclick = () => { block.url = ''; renderEditor(); }; actionsDiv.appendChild(btnEdit);
+                    }
+                    const btnDel = document.createElement('button'); btnDel.className = 'action-btn btn-delete'; btnDel.innerHTML = SVG.del; btnDel.title = "Eliminar"; btnDel.onclick = () => deleteBlock(block.id); actionsDiv.appendChild(btnDel);
+                    container.appendChild(actionsDiv);
+                }
+
+                if (['h1', 'h2', 'h3', 'h4', 'p'].includes(block.type)) {
+                    const el = document.createElement(block.type); el.className = 'editable'; el.contentEditable = isEditable; el.innerHTML = block.content;
+                    const ph = { 'h1': 'Nombre de la Materia...', 'h2': 'Unidad Temática...', 'h3': 'Subtítulo...', 'h4': 'Título pequeño...', 'p': 'Escribe tu texto aquí...' };
+                    el.setAttribute('data-placeholder', ph[block.type]); el.oninput = (e) => updateText(block.id, e.target.innerHTML); container.appendChild(el);
+                } 
+                else if (block.type === 'img') {
+                    if (block.url) { const img = document.createElement('img'); img.src = block.url; img.className = 'img-element'; container.appendChild(img); } 
+                    else if (isEditable) container.appendChild(createUrlBox(block.id, 'img'));
+                } 
+                else if (block.type === 'video') {
+                    if (block.url) { const div = document.createElement('div'); div.innerHTML = getVideoEmbedHTML(block.url); container.appendChild(div); } 
+                    else if (isEditable) container.appendChild(createUrlBox(block.id, 'video'));
+                }
+                else if (block.type === 'p-img') {
+                    const wrapDiv = document.createElement('div'); wrapDiv.className = 'wrap-container';
+                    const imgDiv = document.createElement('div');
+                    if (block.url) { const img = document.createElement('img'); img.src = block.url; img.className = 'img-element'; imgDiv.appendChild(img); } 
+                    else if (isEditable) imgDiv.appendChild(createUrlBox(block.id, 'img'));
+                    wrapDiv.appendChild(imgDiv);
+                    const p = document.createElement('p'); p.className = 'editable'; p.contentEditable = isEditable; p.innerHTML = block.content;
+                    p.setAttribute('data-placeholder', 'Texto explicativo de la imagen...'); p.oninput = (e) => updateText(block.id, e.target.innerHTML); wrapDiv.appendChild(p); container.appendChild(wrapDiv);
+                }
+                else if (block.type === 'link') {
+                    if (isEditable) {
+                        const linkCont = document.createElement('div'); linkCont.className = 'link-edit-container';
+                        linkCont.innerHTML = `<p style="width:100%; margin:0; font-size:14px; color:#475569; font-weight:bold;">🔗 Botón de Enlace</p>`;
+                        const row = document.createElement('div'); row.className = 'link-edit-row';
+                        const txtInput = document.createElement('input'); txtInput.type = 'text'; txtInput.value = block.content; txtInput.className = 'link-edit-input'; txtInput.placeholder = 'Texto del botón...'; txtInput.oninput = e => { block.content = e.target.value; autoSave(); };
+                        const urlInput = document.createElement('input'); urlInput.type = 'text'; urlInput.value = block.url; urlInput.className = 'link-edit-input'; urlInput.placeholder = 'https://...'; urlInput.oninput = e => { block.url = e.target.value; autoSave(); };
+                        row.appendChild(txtInput); row.appendChild(urlInput); linkCont.appendChild(row); container.appendChild(linkCont);
+                    } else {
+                        const aBtn = document.createElement('a'); aBtn.href = block.url || '#'; aBtn.target = '_blank'; aBtn.className = 'btn-text'; aBtn.style.background = 'var(--primary)'; aBtn.style.color = 'white'; aBtn.style.border = 'none'; aBtn.style.display = 'flex'; aBtn.style.width = 'fit-content'; aBtn.style.margin = '20px auto'; aBtn.style.padding = '15px 30px'; aBtn.style.fontSize = '20px'; aBtn.style.textDecoration = 'none'; aBtn.innerHTML = block.content || 'Haz clic aquí'; container.appendChild(aBtn);
+                    }
+                }
+                else if (block.type === 'code') {
+                    const wrapper = document.createElement('div'); wrapper.className = 'code-wrapper';
+                    const btnCopy = document.createElement('button'); btnCopy.className = 'btn-copy-code'; btnCopy.innerHTML = SVG.copy + ' Copiar'; btnCopy.title = "Copiar código";
+                    btnCopy.onclick = () => {
+                        const ta = document.createElement("textarea"); ta.value = block.content; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+                        btnCopy.innerHTML = SVG.check + ' Copiado'; setTimeout(() => btnCopy.innerHTML = SVG.copy + ' Copiar', 2000);
+                    };
+                    wrapper.appendChild(btnCopy);
+                    const pre = document.createElement('pre'); pre.className = 'editable'; pre.contentEditable = isEditable; pre.textContent = block.content; 
+                    pre.oninput = (e) => updateText(block.id, e.target.innerText);
+                    pre.addEventListener('paste', function(e) { e.preventDefault(); const text = (e.originalEvent || e).clipboardData.getData('text/plain'); document.execCommand('insertText', false, text); });
+                    wrapper.appendChild(pre); container.appendChild(wrapper);
+                }
+                else if (block.type === 'quiz') {
+                    if (isEditable) {
+                        const qzCont = document.createElement('div'); qzCont.className = 'quiz-edit-container';
+                        const titleInput = document.createElement('input'); titleInput.className = 'quiz-title-input'; titleInput.value = block.quizTitle; titleInput.placeholder = 'Nombre de la Evaluación'; titleInput.oninput = e => { block.quizTitle = e.target.value; autoSave(); };
+                        qzCont.appendChild(titleInput);
+                        
+                        block.questions.forEach((q, qIdx) => {
+                            const qCard = document.createElement('div'); qCard.className = 'quiz-edit-card';
+                            const qHeader = document.createElement('div'); qHeader.className = 'quiz-q-header-edit';
+                            qHeader.innerHTML = `<span>📝 Pregunta ${qIdx + 1}</span>`;
+                            const btnDelQ = document.createElement('button'); btnDelQ.className = 'btn-text'; btnDelQ.innerHTML = SVG.del + ' Eliminar'; btnDelQ.onclick = () => { block.questions.splice(qIdx, 1); autoSave(); renderEditor(); };
+                            qHeader.appendChild(btnDelQ); qCard.appendChild(qHeader);
+                            
+                            const qTextInput = document.createElement('input'); qTextInput.className = 'quiz-q-text-input'; qTextInput.value = q.q; qTextInput.placeholder = 'Escribe la pregunta aquí...'; qTextInput.oninput = e => { q.q = e.target.value; autoSave(); };
+                            qCard.appendChild(qTextInput);
+                            
+                            const optsCtrl = document.createElement('div'); optsCtrl.style.marginBottom = '15px';
+                            const btnToggleOpts = document.createElement('button'); btnToggleOpts.className = 'btn-text'; btnToggleOpts.innerHTML = SVG.refresh + (q.options.length === 4 ? ' Usar 2 Opciones' : ' Usar 4 Opciones');
+                            btnToggleOpts.onclick = () => { if (q.options.length === 4) { q.options = q.options.slice(0, 2); if (q.correctIndex >= 2) q.correctIndex = 0; } else { q.options.push('Opción 3', 'Opción 4'); } autoSave(); renderEditor(); };
+                            optsCtrl.appendChild(btnToggleOpts); qCard.appendChild(optsCtrl);
+                            
+                            q.options.forEach((opt, oIdx) => {
+                                const optRow = document.createElement('div'); optRow.className = 'quiz-edit-option';
+                                const radio = document.createElement('input'); radio.type = 'radio'; radio.name = `correct-${block.id}-${qIdx}`; radio.checked = q.correctIndex === oIdx; radio.title = "Marcar respuesta correcta"; radio.onchange = () => { q.correctIndex = oIdx; autoSave(); };
+                                const txt = document.createElement('input'); txt.type = 'text'; txt.value = opt; txt.placeholder = `Alternativa ${oIdx + 1}...`; txt.oninput = e => { q.options[oIdx] = e.target.value; autoSave(); };
+                                optRow.appendChild(radio); optRow.appendChild(txt); qCard.appendChild(optRow);
+                            });
+                            qzCont.appendChild(qCard);
+                        });
+                        const btnAddQ = document.createElement('button'); btnAddQ.className = 'btn-text'; btnAddQ.style.width = '100%'; btnAddQ.style.background = '#FFFFFF'; btnAddQ.innerHTML = SVG.plus + ' Añadir Pregunta'; btnAddQ.onclick = () => { block.questions.push({ q: '', options: ['','','',''], correctIndex: 0 }); autoSave(); renderEditor(); };
+                        qzCont.appendChild(btnAddQ); container.appendChild(qzCont);
+                    } else {
+                        const encodedData = encodeURIComponent(JSON.stringify(block));
+                        container.innerHTML = `<div class="quiz-app-container" id="quiz-${block.id}" data-quiz="${encodedData}"><div class="quiz-ui-root"></div></div>`;
+                    }
+                }
+                editor.appendChild(container);
+            });
+            if (!isEditable) initQuizzes();
+            
+            generateMenu();
+        }
+
+        function createUrlBox(blockId, type) {
+            const box = document.createElement('div'); box.className = 'url-input-box'; const inputId = 'url-' + blockId;
+            box.innerHTML = `<p>${type === 'video' ? '🎬 URL del Video (YouTube o TikTok)' : '🖼️ URL de la Imagen'}</p><div class="url-input-row"><input type="text" id="${inputId}" placeholder="https://..."><button class="btn-apply" onclick="setImageURL(${blockId}, '${inputId}')">${SVG.check}</button></div>`;
+            return box;
+        }
+
+        // --- MOTOR GLOBAL DE TAREAS ---
+        function initQuizzes() {
+            document.querySelectorAll('.quiz-app-container').forEach(container => {
+                if (container.dataset.initialized) return;
+                container.dataset.initialized = 'true';
+                
+                const root = container.querySelector('.quiz-ui-root'); 
+                const block = JSON.parse(decodeURIComponent(container.dataset.quiz));
+                
+                let studentName = '', score = 0, currentQ = 0, shuffledQs = []; 
+                const colors = ['k-red', 'k-blue', 'k-yellow', 'k-green'];
+
+                function renderStart() {
+                    root.innerHTML = `<div class="quiz-start"><div style="font-size:70px; margin-bottom:20px;">🎓</div><h2 style="margin:0 0 20px; font-size:40px; color:#0f172a; overflow-wrap:break-word;">${block.quizTitle || 'Tarea'}</h2><p style="color:#64748b; margin-bottom:30px; font-size:22px;">Ingresa tu nombre para comenzar la evaluación.</p><input type="text" id="sn-${block.id}" placeholder="Tu nombre..." class="quiz-name-input"><br><button class="btn-text" style="width:100%; max-width:400px; padding:20px; background:var(--primary); color:white; font-size:24px; border:none; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" id="st-${block.id}">Comenzar Prueba</button></div>`;
+                    document.getElementById(`st-${block.id}`).onclick = () => {
+                        const nm = document.getElementById(`sn-${block.id}`).value.trim(); if (!nm) return alert('Por favor, ingresa tu nombre.'); studentName = nm;
+                        let vQs = block.questions.filter(q => q.q.trim() !== ''); vQs.sort(() => Math.random() - 0.5); shuffledQs = vQs.slice(0, 10);
+                        if (shuffledQs.length === 0) return root.innerHTML = `<p style="text-align:center; font-size:2em; color:#64748B;">Esta tarea aún no tiene preguntas configuradas.</p>`;
+                        score = 0; currentQ = 0; renderQuestion();
+                    };
+                }
+
+                function renderQuestion() {
+                    const qD = shuffledQs[currentQ];
+                    let opts = qD.options.map((text, i) => ({ text, isCorrect: i === qD.correctIndex })); opts.sort(() => Math.random() - 0.5); 
+                    let optsHtml = opts.map((opt, i) => `<button class="k-btn ${colors[i % 4]}" data-correct="${opt.isCorrect}">${opt.text}</button>`).join('');
+                    root.innerHTML = `<div class="quiz-q-header">PREGUNTA ${currentQ + 1} DE ${shuffledQs.length}</div><h3 class="quiz-question">${qD.q}</h3><div class="kahoot-grid" style="grid-template-columns: ${opts.length === 2 ? '1fr' : '1fr 1fr'}">${optsHtml}</div><div class="quiz-feedback" style="display:none;"></div><button class="btn-text quiz-next-btn" style="display:none; margin: 40px auto 0; padding:15px 40px; background:#0F172A; color:white; border:none; font-size:24px;">Siguiente ➡️</button>`;
+                    
+                    const btns = root.querySelectorAll('.k-btn'), fb = root.querySelector('.quiz-feedback'), nBtn = root.querySelector('.quiz-next-btn');
+                    btns.forEach(btn => {
+                        btn.onclick = () => {
+                            btns.forEach(b => { b.disabled = true; b.style.opacity = '0.5'; }); btn.style.opacity = '1';
+                            const isC = btn.dataset.correct === 'true'; fb.style.display = 'block';
+                            if (isC) { score++; fb.innerHTML = "¡Correcto! ✅"; fb.className = 'quiz-feedback correct-feedback'; } 
+                            else {
+                                fb.innerHTML = "Incorrecto ❌"; fb.className = 'quiz-feedback incorrect-feedback';
+                                btns.forEach(b => { if (b.dataset.correct === 'true') { b.style.opacity = '1'; b.style.boxShadow = '0 0 0 6px #26890c'; } });
+                            }
+                            nBtn.style.display = 'flex';
+                        };
+                    });
+                    nBtn.onclick = () => { currentQ++; if (currentQ < shuffledQs.length) renderQuestion(); else renderResults(); };
+                }
+
+                function renderResults() {
+                    const fn = Math.round((score / shuffledQs.length) * 100), p = fn >= 51;
+                    root.innerHTML = `<div class="quiz-results"><div style="font-size:100px; margin-bottom:20px;">${p ? '🏆' : '📚'}</div><h2 style="margin:0 0 15px; font-size:40px; color:#0f172a; overflow-wrap:break-word;">${block.quizTitle}</h2><p style="font-size:24px; color:#475569; margin-bottom: 30px;">Estudiante: <b>${studentName}</b></p><div style="background:white; padding:40px; border-radius:20px; border:4px solid ${p ? '#26890C' : '#E21B3C'}; max-width:450px; margin:0 auto 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);"><p style="margin:0 0 10px 0; font-size:18px; color:#64748B; font-weight:bold; letter-spacing:1px;">CALIFICACIÓN FINAL</p><h1 style="margin:0; font-size:100px; color:${p ? '#26890C' : '#E21B3C'}; line-height:1;">${fn}</h1><p style="margin:15px 0 0 0; font-size:22px; color:#334155;">${score} de ${shuffledQs.length} correctas</p></div><button class="btn-text" id="rt-${block.id}" style="margin: 0 auto; padding: 15px 30px; background:#0F172A; color:white; border:none; font-size:20px;">🔄 Volver a Intentar</button></div>`;
+                    document.getElementById(`rt-${block.id}`).onclick = () => renderStart();
+                }
+                renderStart();
+            });
+        }
+
+        // 8. DESCARGAR HTML SEGURO
+        function downloadHTML() {
+            // Documento Virtual en Memoria
+            const expD = document.implementation.createHTMLDocument("Mi Presentación");
+            const ms = expD.createElement('meta'); ms.setAttribute('charset', 'UTF-8'); expD.head.appendChild(ms);
+            const mv = expD.createElement('meta'); mv.setAttribute('name', 'viewport'); mv.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); expD.head.appendChild(mv);
+
+            const st = expD.createElement('style');
+            st.textContent = `
+                * { box-sizing: border-box; }
+                html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+                body { margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8FAFC; color: #0F172A; overflow-x: hidden; padding-bottom: 100px; }
+                #editor { width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 5%; min-height: 60vh; }
+                .block-container { position: relative; margin-bottom: 20px; padding: 10px; }
+                
+                .editable { outline: none; margin: 0; line-height: 1.3; min-height: 1em; overflow-wrap: break-word; word-break: break-word; }
+                h1.editable { font-size: 4em; margin-bottom: 0.3em; font-weight: 800; letter-spacing: -0.02em; color: #0F172A; }
+                h2.editable { font-size: 3.2em; margin-bottom: 0.3em; font-weight: 700; color: #1E293B; }
+                h3.editable { font-size: 2.6em; margin-bottom: 0.3em; font-weight: 600; color: #334155; }
+                h4.editable { font-size: 2.2em; margin-bottom: 0.3em; font-weight: 600; color: #475569; }
+                p.editable { font-size: 1.8em; color: #475569; line-height: 1.6; }
+                
+                .img-element { width: 100%; max-width: 100%; border-radius: 16px; display: block; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+                .video-wrapper { width: 100%; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+                .yt-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
+                .yt-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+                .tk-wrapper { max-width: 400px; height: 700px; margin: 0 auto; }
+                .tk-wrapper iframe { width: 100%; height: 100%; border: 0; }
+                
+                .wrap-container { display: block; } .wrap-container::after { content: ""; clear: both; display: table; }
+                .wrap-container .img-element { float: right; width: 45%; max-width: 400px; margin: 0 0 20px 30px; clear: right; }
+                .wrap-container p { min-height: 100px; }
+                
+                .code-wrapper { position: relative; background: #1E293B; border-radius: 12px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+                .code-wrapper pre { margin: 0; padding: 50px 20px 20px 20px; color: #F8FAFC; font-family: 'Courier New', monospace; font-size: 18px; overflow-x: auto; white-space: pre; word-break: normal; overflow-wrap: normal; outline: none; }
+                .btn-copy-code { position: absolute; top: 10px; right: 10px; background: #334155; color: white; border: 1px solid #475569; padding: 6px 12px; border-radius: 6px; font-size: 14px; cursor: pointer; z-index: 5; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+                .btn-copy-code:hover { background: #475569; }
+
+                /* QUIZ */
+                .quiz-app-container { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); padding: 60px 40px; border-radius: 24px; border: 1px solid #E2E8F0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); margin: 40px 0; }
+                .quiz-name-input { width: 100%; max-width: 600px; padding: 25px; font-size: 28px; border: 3px solid #CBD5E1; border-radius: 12px; margin-bottom: 30px; text-align: center; font-weight: bold; outline: none; transition: border-color 0.3s; }
+                .quiz-name-input:focus { border-color: #4F46E5; }
+                .quiz-start, .quiz-results { text-align: center; }
+                .quiz-q-header { font-size: 20px; color: #64748b; font-weight: 800; margin-bottom: 15px; letter-spacing: 2px; }
+                .quiz-question { font-size: 3.5em; margin-bottom: 40px; font-weight: 900; color: #0f172a; overflow-wrap: break-word; word-break: break-word; line-height: 1.2; }
+                .kahoot-grid { display: grid; gap: 24px; }
+                .k-btn { padding: 40px 20px; font-size: 2.5em; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: bold; box-shadow: 0 8px 0 rgba(0,0,0,0.2); transition: transform 0.1s, box-shadow 0.1s, filter 0.2s; display: flex; align-items: center; justify-content: center; overflow-wrap: break-word; word-break: break-word; line-height: 1.3;}
+                .k-btn:active:not(:disabled) { transform: translateY(8px); box-shadow: none; }
+                .k-red { background-color: #E21B3C; } .k-blue { background-color: #1368CE; } .k-yellow { background-color: #D89E00; } .k-green { background-color: #26890C; }
+                .quiz-feedback { text-align: center; font-size: 3em; font-weight: 900; margin-top: 30px; min-height: 1.5em; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+                .correct-feedback { color: #26890C; } .incorrect-feedback { color: #E21B3C; }
+                .btn-text { background: #111827; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight:bold; }
+                @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+                /* MENÚ LATERAL Y BARRA INFERIOR ACTUALIZADOS */
+                .toc-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 10004; display: none; backdrop-filter: blur(4px); }
+                .toc-overlay.open { display: block; }
+                .toc-menu { position: fixed; top: 0; left: -100%; width: 350px; max-width: 85%; height: 100%; height: 100dvh; background: white; z-index: 10005; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; padding: 30px 30px 90px 30px; box-shadow: 10px 0 25px rgba(0,0,0,0.15); }
+                .toc-menu.open { left: 0; }
+                .toc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #4F46E5; padding-bottom: 15px; margin-bottom: 20px; }
+                .toc-header h3 { margin: 0; font-size: 24px; color: #0F172A; font-weight: 800; }
+                .toc-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #64748B; padding: 0; transition: color 0.2s; } .toc-close:hover { color: #0F172A; }
+                .toc-item { list-style: none; margin-bottom: 10px; }
+                .toc-item a { text-decoration: none; color: #334155; display: block; padding: 10px 12px; border-radius: 8px; transition: background 0.2s, color 0.2s; line-height: 1.4; white-space: normal; word-wrap: break-word; font-size: 16px; }
+                .toc-item a:hover { background: #EEF2FF; color: #4F46E5; font-weight: bold; }
+                .toc-h1 { font-weight: 800; font-size: 18px; margin-top: 25px; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px; color: #0F172A; }
+                .toc-h1 a { font-size: 18px; color: #0F172A; }
+                .toc-h2 { margin-left: 15px; font-weight: 700; color: #1E293B; }
+                .toc-h3 { margin-left: 30px; color: #475569; }
+
+                .mobile-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: rgba(255, 255, 255, 0.95); border-top: 1px solid #E2E8F0; justify-content: center; gap: 50px; align-items: center; z-index: 99999; padding-bottom: env(safe-area-inset-bottom); backdrop-filter: blur(10px); box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+                .bottom-bar-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #64748B; font-size: 14px; font-weight: 800; cursor: pointer; width: 100px; gap: 8px; text-decoration: none; padding: 0; height: 100%; transition: all 0.2s; }
+                .bottom-bar-btn svg { width: 28px; height: 28px; stroke: currentColor; transition: transform 0.2s; }
+                .bottom-bar-btn:hover { color: #4F46E5; } .bottom-bar-btn:hover svg { transform: translateY(-3px); }
+                .bottom-bar-btn.active { color: #EF4444; }
+                
+                #laser-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99998; display: none; }
+                body.laser-on { cursor: none !important; } body.laser-on * { cursor: none !important; }
+                #laser-canvas.active { display: block; }
+
+                @media (max-width: 600px) {
+                    body { padding-bottom: 90px !important; }
+                    #editor { padding: 15px; margin: 0; border-radius: 0; min-height: auto; }
+                    h1.editable { font-size: 2.2em; } h2.editable { font-size: 1.8em; } h3.editable { font-size: 1.5em; } h4.editable { font-size: 1.3em; } p.editable { font-size: 1.1em; }
+                    .wrap-container .img-element { float: none; width: 100%; max-width: 100%; margin: 0 0 15px 0; }
+                    .quiz-app-container { padding: 25px 15px; margin: 15px 0; border-radius: 16px; }
+                    .quiz-name-input { font-size: 18px; padding: 15px; }
+                    .quiz-question { font-size: 1.6em; margin-bottom: 25px; }
+                    .kahoot-grid { grid-template-columns: 1fr !important; gap: 12px; }
+                    .k-btn { font-size: 1.3em; padding: 20px 15px; border-radius: 12px; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+                    .k-btn:active:not(:disabled) { transform: translateY(4px); }
+                    .quiz-feedback { font-size: 1.8em; margin-top: 15px; }
+                    .quiz-results h1 { font-size: 48px !important; }
+                    .mobile-bottom-bar { justify-content: space-around; gap: 0; height: 65px; }
+                    .bottom-bar-btn { width: 100%; font-size: 12px; gap: 4px; }
+                    .bottom-bar-btn svg { width: 24px; height: 24px; }
+                    .toc-menu { padding: 25px 20px 90px 20px; }
+                }
+                @media (max-width: 350px) {
+                    #editor { padding: 12px 8px; } h1.editable { font-size: 1.8em; } h2.editable { font-size: 1.5em; } p.editable { font-size: 1em; }
+                    .quiz-question { font-size: 1.4em; } .k-btn { font-size: 1.1em; padding: 15px 10px; } .quiz-results h1 { font-size: 36px !important; }
+                    .mobile-bottom-bar { height: 60px; } .bottom-bar-btn svg { width: 22px; height: 22px; } .bottom-bar-btn { font-size: 10px; }
+                }
+            `;
+            expD.head.appendChild(st);
+
+            // 1. Menú Lateral
+            let menuHtml = ''; let hasItems = false;
+            blocks.forEach(b => {
+                if (['h1', 'h2', 'h3'].includes(b.type) && b.content.trim() !== '') {
+                    hasItems = true; const tD = document.createElement('div'); tD.innerHTML = b.content;
+                    menuHtml += `<li class="toc-item toc-${b.type}"><a href="#block-${b.id}" onclick="toggleMenu()">${tD.textContent || tD.innerText || 'Sin título'}</a></li>`;
+                }
+            });
+            if (!hasItems) menuHtml = '<p style="color:#94A3B8; text-align:center; margin-top:30px; font-size:16px;">No hay unidades registradas.</p>';
+
+            const tD = expD.createElement('div');
+            tD.innerHTML = `<div id="toc-overlay" class="toc-overlay" onclick="toggleMenu()"></div><div id="toc-menu" class="toc-menu"><div class="toc-header"><h3>📑 Índice</h3><button class="toc-close" onclick="toggleMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div><ul id="toc-list" style="padding:0; margin:0;">${menuHtml}</ul></div>`;
+            expD.body.appendChild(tD);
+
+            // 2. Barra Inferior Mobile
+            const mb = expD.createElement('div');
+            mb.innerHTML = `<div id="mobile-bottom-bar" class="mobile-bottom-bar"><button class="bottom-bar-btn" onclick="toggleMenu()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg><span>Menú</span></button><a href="index.html" class="bottom-bar-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Inicio</span></a><button class="bottom-bar-btn" onclick="toggleLaser()" id="btn-laser-mobile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg><span id="text-laser-mobile">Láser</span></button></div>`;
+            expD.body.appendChild(mb);
+
+            // 3. Contenedor de Bloques Editor (donde irá el contenido)
+            const ed = expD.createElement('div');
+            ed.id = 'editor';
+            
+            let hc = '';
+            blocks.forEach(b => {
+                if (['h1', 'h2', 'h3', 'h4', 'p'].includes(b.type) && b.content.trim() !== '') hc += `<div class="block-container" id="block-${b.id}"><${b.type} class="editable">${b.content}</${b.type}></div>`;
+                else if (b.type === 'img' && b.url) hc += `<div class="block-container" id="block-${b.id}"><img src="${b.url}" class="img-element" alt="Imagen"></div>`;
+                else if (b.type === 'video' && b.url) hc += `<div class="block-container" id="block-${b.id}">${getVideoEmbedHTML(b.url)}</div>`;
+                else if (b.type === 'link') hc += `<div class="block-container" id="block-${b.id}"><a href="${b.url}" target="_blank" class="btn-text" style="display:flex; width:fit-content; margin:15px auto; padding:20px 40px; font-size:24px; justify-content:center; text-decoration:none; background:#4F46E5; color:white; border-radius:12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">${b.content}</a></div>`;
+                else if (b.type === 'code') hc += `<div class="block-container" id="block-${b.id}"><div class="code-wrapper"><button class="btn-copy-code" onclick="copyCode(this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copiar</button><pre><code>${b.content.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}</code></pre></div></div>`;
+                else if (b.type === 'p-img') hc += `<div class="block-container" id="block-${b.id}"><div class="wrap-container">${b.url ? `<img src="${b.url}" class="img-element" alt="Imagen">` : ''}<p class="editable">${b.content}</p></div></div>`;
+                else if (b.type === 'quiz') {
+                    const encData = encodeURIComponent(JSON.stringify(b));
+                    hc += `<div class="block-container" id="block-${b.id}"><div class="quiz-app-container" data-quiz="${encData}"><div class="quiz-ui-root"></div></div></div>`;
+                }
+            });
+            ed.innerHTML = hc; 
+            expD.body.appendChild(ed);
+            
+            const cv = expD.createElement('canvas'); cv.id = 'laser-canvas'; expD.body.appendChild(cv);
+
+            // 4. Scripts Inyectados
+            const sc = expD.createElement('script');
+            sc.textContent = `
+                function toggleMenu() { const m = document.getElementById('toc-menu'), o = document.getElementById('toc-overlay'); if (m.classList.contains('open')) { m.classList.remove('open'); o.classList.remove('open'); } else { m.classList.add('open'); o.classList.add('open'); } }
+                function copyCode(b){ const t = document.createElement("textarea"); t.value = b.nextElementSibling.innerText; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); const o = b.innerHTML; b.innerHTML = '✅ Copiado'; setTimeout(() => b.innerHTML = o, 2000); }
+                
+                let laserActive = false; let mouseX = -100, mouseY = -100;
+                function toggleLaser() {
+                    laserActive = !laserActive; const c = document.getElementById('laser-canvas'), mb = document.getElementById('btn-laser-mobile');
+                    if (laserActive) { c.classList.add('active'); document.body.classList.add('laser-on'); if(mb){ mb.classList.add('active'); document.getElementById('text-laser-mobile').innerText='Apagar'; } } 
+                    else { c.classList.remove('active'); document.body.classList.remove('laser-on'); if(mb){ mb.classList.remove('active'); document.getElementById('text-laser-mobile').innerText='Láser'; } c.getContext('2d').clearRect(0,0,c.width,c.height); }
+                }
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && laserActive) toggleLaser(); });
+                const cnv = document.getElementById('laser-canvas'); const ctx = cnv.getContext('2d');
+                function rs() { cnv.width = window.innerWidth; cnv.height = window.innerHeight; } window.addEventListener('resize', rs); rs();
+                window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+                window.addEventListener('touchstart', e => { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; }, {passive: true});
+                window.addEventListener('touchmove', e => { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; }, {passive: true});
+                function dL() {
+                    ctx.clearRect(0, 0, cnv.width, cnv.height);
+                    if (laserActive) { ctx.beginPath(); ctx.arc(mouseX, mouseY, 8, 0, Math.PI * 2); ctx.fillStyle = 'rgba(239, 68, 68, 0.9)'; ctx.shadowColor = 'rgba(239, 68, 68, 1)'; ctx.shadowBlur = 15; ctx.fill(); ctx.shadowBlur = 0; }
+                    requestAnimationFrame(dL);
+                }
+                dL();
+
+                // Quiz Engine
+                document.querySelectorAll('.quiz-app-container').forEach(c => {
+                    const r = c.querySelector('.quiz-ui-root'); const b = JSON.parse(decodeURIComponent(c.dataset.quiz));
+                    let sn = '', sc = 0, cq = 0, sqs = []; const cols = ['k-red', 'k-blue', 'k-yellow', 'k-green'];
+                    function rS() {
+                        r.innerHTML = '<div class="quiz-start"><div style="font-size:70px; margin-bottom:20px;">🎓</div><h2 style="margin:0 0 20px; font-size:40px; color:#0f172a; overflow-wrap:break-word;">'+(b.quizTitle||'Tarea')+'</h2><p style="color:#64748b; margin-bottom:30px; font-size:22px;">Ingresa tu nombre para comenzar la evaluación.</p><input type="text" id="sn-'+b.id+'" placeholder="Tu nombre..." class="quiz-name-input"><br><button class="btn-text" style="width:100%; max-width:400px; padding:20px; background:#4F46E5; color:white; font-size:24px; border:none; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" id="st-'+b.id+'">Comenzar Prueba</button></div>';
+                        document.getElementById('st-'+b.id).onclick = () => {
+                            const nm = document.getElementById('sn-'+b.id).value.trim(); if(!nm) return alert('Por favor, ingresa tu nombre.'); sn = nm;
+                            let vQs = b.questions.filter(qu => qu.q.trim() !== ''); vQs.sort(() => Math.random() - 0.5); sqs = vQs.slice(0,10);
+                            if(sqs.length === 0) return r.innerHTML = '<p style="text-align:center; font-size:2em; color:#64748B;">Esta tarea aún no tiene preguntas configuradas.</p>';
+                            sc = 0; cq = 0; rQ();
+                        };
+                    }
+                    function rQ() {
+                        const qD = sqs[cq]; let opts = qD.options.map((t, i) => ({ t, iC: i === qD.correctIndex })); opts.sort(() => Math.random() - 0.5);
+                        let oH = opts.map((opt, i) => '<button class="k-btn '+cols[i % 4]+'" data-c="'+opt.iC+'">'+opt.t+'</button>').join('');
+                        r.innerHTML = '<div class="quiz-q-header">PREGUNTA '+(cq + 1)+' DE '+sqs.length+'</div><h3 class="quiz-question">'+qD.q+'</h3><div class="kahoot-grid" style="grid-template-columns: '+(opts.length === 2 ? '1fr' : '1fr 1fr')+'">'+oH+'</div><div class="quiz-feedback" style="display:none;"></div><button class="btn-text quiz-next-btn" style="display:none; margin: 40px auto 0; padding:15px 40px; background:#0F172A; color:white; border:none; font-size:24px;">Siguiente ➡️</button>';
+                        const btns = r.querySelectorAll('.k-btn'), fb = r.querySelector('.quiz-feedback'), nBtn = r.querySelector('.quiz-next-btn');
+                        btns.forEach(btn => {
+                            btn.onclick = () => {
+                                btns.forEach(bx => { bx.disabled = true; bx.style.opacity = '0.5'; }); btn.style.opacity = '1';
+                                const isC = btn.dataset.c === 'true'; fb.style.display = 'block';
+                                if (isC) { sc++; fb.innerHTML = "¡Correcto! ✅"; fb.className = 'quiz-feedback correct-feedback'; } 
+                                else { fb.innerHTML = "Incorrecto ❌"; fb.className = 'quiz-feedback incorrect-feedback'; btns.forEach(bx => { if (bx.dataset.c === 'true') { bx.style.opacity = '1'; bx.style.boxShadow = '0 0 0 6px #26890c'; } }); }
+                                nBtn.style.display = 'flex';
+                            };
+                        });
+                        nBtn.onclick = () => { cq++; if(cq < sqs.length) rQ(); else rR(); };
+                    }
+                    function rR() {
+                        const fn = Math.round((sc / sqs.length) * 100), p = fn >= 51;
+                        r.innerHTML = '<div class="quiz-results"><div style="font-size:100px; margin-bottom:20px;">'+(p?'🏆':'📚')+'</div><h2 style="margin:0 0 15px; font-size:40px; color:#0f172a; overflow-wrap:break-word;">'+b.quizTitle+'</h2><p style="font-size:24px; color:#475569; margin-bottom: 30px;">Estudiante: <b>'+sn+'</b></p><div style="background:white; padding:40px; border-radius:20px; border:4px solid '+(p?'#26890C':'#E21B3C')+'; max-width:450px; margin:0 auto 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);"><p style="margin:0 0 10px 0; font-size:18px; color:#64748B; font-weight:bold; letter-spacing:1px;">CALIFICACIÓN FINAL</p><h1 style="margin:0; font-size:100px; color:'+(p?'#26890C':'#E21B3C')+'; line-height:1;">'+fn+'</h1><p style="margin:15px 0 0 0; font-size:22px; color:#334155;">'+sc+' de '+sqs.length+' correctas</p></div><button class="btn-text" id="rt-'+b.id+'" style="margin: 0 auto; padding: 15px 30px; background:#0F172A; color:white; border:none; font-size:20px;">🔄 Volver a Intentar</button></div>';
+                        document.getElementById('rt-'+b.id).onclick = () => rS();
+                    }
+                    rS();
+                });
+            `;
+            expD.body.appendChild(sc);
+
+            const fnCode = "<!DOCTYPE html>\n" + expD.documentElement.outerHTML;
+            const blob = new Blob([fnCode], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'index.html';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            showSaveIndicator("¡Archivo descargado!");
+        }
+    </script>
+</body>
+</html>
